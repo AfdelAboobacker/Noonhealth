@@ -7,6 +7,9 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
   const [favorites, setFavorites] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(4);
 
+  // Store touch starting position
+  const [touchStart, setTouchStart] = useState(null);
+
   // Responsive number of visible products
   useEffect(() => {
     const updateVisibleProducts = () => {
@@ -34,6 +37,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
   // Maximum carousel position
   const maxIndex = Math.max(products.length - visibleProducts, 0);
 
+  // Favorite
   const handleFavorite = (product) => {
     setFavorites((prev) =>
       prev.includes(product.id)
@@ -42,10 +46,12 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
     );
   };
 
+  // Previous
   const handlePrevious = () => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
+  // Next
   const handleNext = () => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
   };
@@ -54,6 +60,37 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
   useEffect(() => {
     setCurrentIndex((prev) => Math.min(prev, maxIndex));
   }, [visibleProducts, maxIndex]);
+
+  // =========================
+  // TOUCH SWIPE
+  // =========================
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+
+    const touchEnd = e.changedTouches[0].clientX;
+
+    const swipeDistance = touchStart - touchEnd;
+
+    // Minimum distance required for swipe
+    const minimumSwipeDistance = 50;
+
+    // Swipe LEFT
+    if (swipeDistance > minimumSwipeDistance) {
+      handleNext();
+    }
+
+    // Swipe RIGHT
+    if (swipeDistance < -minimumSwipeDistance) {
+      handlePrevious();
+    }
+
+    setTouchStart(null);
+  };
 
   if (!products.length) {
     return null;
@@ -65,16 +102,15 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
       <h2
         className="
           mb-6
-          sm:mb-8
-
           text-center
-
           text-2xl
-          sm:text-3xl
-          md:text-4xl
-
           font-bold
           text-[#486400]
+
+          sm:mb-8
+          sm:text-3xl
+
+          md:text-4xl
         "
       >
         {title}
@@ -87,10 +123,12 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
           mx-auto
           w-full
           max-w-[1200px]
-
           px-9
+
           sm:px-11
+
           md:px-12
+
           lg:px-14
         "
       >
@@ -109,21 +147,22 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
             flex
             h-9
             w-9
-            sm:h-10
-            sm:w-10
-            md:h-11
-            md:w-11
-
             -translate-y-1/2
             items-center
             justify-center
 
             rounded-full
             border-2
-            md:border-[3px]
 
             transition-all
             duration-200
+
+            sm:h-10
+            sm:w-10
+
+            md:h-11
+            md:w-11
+            md:border-[3px]
 
             ${
               currentIndex === 0
@@ -134,13 +173,17 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
         >
           <ChevronLeft
             size={22}
-            className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+            className="sm:h-6 sm:w-6 md:h-7 md:w-7"
             strokeWidth={2.5}
           />
         </button>
 
         {/* Products */}
-        <div className="overflow-hidden">
+        <div
+          className="overflow-hidden touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             className="
               flex
@@ -196,21 +239,22 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
             flex
             h-9
             w-9
-            sm:h-10
-            sm:w-10
-            md:h-11
-            md:w-11
-
             -translate-y-1/2
             items-center
             justify-center
 
             rounded-full
             border-2
-            md:border-[3px]
 
             transition-all
             duration-200
+
+            sm:h-10
+            sm:w-10
+
+            md:h-11
+            md:w-11
+            md:border-[3px]
 
             ${
               currentIndex === maxIndex
@@ -221,7 +265,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
         >
           <ChevronRight
             size={22}
-            className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+            className="sm:h-6 sm:w-6 md:h-7 md:w-7"
             strokeWidth={2.5}
           />
         </button>
