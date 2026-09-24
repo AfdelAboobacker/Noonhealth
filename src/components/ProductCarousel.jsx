@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "./ProductCard";
 
@@ -7,8 +7,11 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
   const [favorites, setFavorites] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(4);
 
-  // Store touch starting position
-  const [touchStart, setTouchStart] = useState(null);
+  // Dragging states
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+
+  const startX = useRef(0);
 
   // Responsive number of visible products
   useEffect(() => {
@@ -62,42 +65,77 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
   }, [visibleProducts, maxIndex]);
 
   // =========================
-  // TOUCH SWIPE
+  // TOUCH / POINTER START
   // =========================
 
-  const handleTouchStart = (e) => {
-    setTouchStart(e.touches[0].clientX);
+  const handlePointerDown = (e) => {
+    startX.current = e.clientX;
+
+    setIsDragging(true);
+    setDragOffset(0);
+
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const handleTouchEnd = (e) => {
-    if (touchStart === null) return;
+  // =========================
+  // TOUCH / POINTER MOVE
+  // =========================
 
-    const touchEnd = e.changedTouches[0].clientX;
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
 
-    const swipeDistance = touchStart - touchEnd;
+    const currentX = e.clientX;
+    const difference = currentX - startX.current;
 
-    // Minimum distance required for swipe
+    setDragOffset(difference);
+  };
+
+  // =========================
+  // TOUCH / POINTER END
+  // =========================
+
+  const handlePointerUp = (e) => {
+    if (!isDragging) return;
+
+    const difference = e.clientX - startX.current;
+
     const minimumSwipeDistance = 50;
 
-    // Swipe LEFT
-    if (swipeDistance > minimumSwipeDistance) {
+    if (difference < -minimumSwipeDistance) {
+      // Swipe left
       handleNext();
-    }
-
-    // Swipe RIGHT
-    if (swipeDistance < -minimumSwipeDistance) {
+    } else if (difference > minimumSwipeDistance) {
+      // Swipe right
       handlePrevious();
     }
 
-    setTouchStart(null);
+    setIsDragging(false);
+    setDragOffset(0);
+
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore if pointer capture was already released
+    }
+  };
+
+  // Cancel drag
+  const handlePointerCancel = () => {
+    setIsDragging(false);
+    setDragOffset(0);
   };
 
   if (!products.length) {
     return null;
   }
 
+  // Normal position
+  const normalPosition =
+    currentIndex * (100 / visibleProducts);
+
   return (
     <section className="w-full py-8 sm:py-10">
+
       {/* Title */}
       <h2
         className="
@@ -132,6 +170,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
           lg:px-14
         "
       >
+
         {/* Previous Button */}
         <button
           type="button"
@@ -180,21 +219,38 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
 
         {/* Products */}
         <div
-          className="overflow-hidden touch-pan-y"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          className="
+            overflow-hidden
+            touch-pan-y
+            select-none
+          "
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
         >
           <div
-            className="
+            className={`
               flex
-              transition-transform
-              duration-500
-              ease-in-out
-            "
+              ${
+                isDragging
+                  ? "cursor-grabbing"
+                  : "cursor-grab"
+              }
+              ${
+                isDragging
+                  ? ""
+                  : "transition-transform duration-500 ease-out"
+              }
+            `}
             style={{
-              transform: `translateX(-${
-                currentIndex * (100 / visibleProducts)
-              }%)`,
+              transform: `
+                translateX(
+                  calc(
+                    -${normalPosition}% + ${dragOffset}px
+                  )
+                )
+              `,
             }}
           >
             {products.map((product) => (
@@ -269,6 +325,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
             strokeWidth={2.5}
           />
         </button>
+
       </div>
     </section>
   );
