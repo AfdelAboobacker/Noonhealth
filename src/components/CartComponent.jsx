@@ -11,14 +11,14 @@ const CartComponent = ({
   // No items
   if (cartItems.length === 0) {
     return (
-      <main className="mx-auto max-w-[1200px] px-5 py-10 md:px-8">
+      <main className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 md:px-8 lg:py-12 xl:px-10">
 
-        <h1 className="text-3xl font-semibold text-[#4b6800]">
+        <h1 className="text-2xl font-semibold text-[#4b6800] sm:text-3xl">
           Shopping Cart
         </h1>
 
-        <div className="mt-8 flex min-h-[300px] items-center justify-center rounded-lg border border-gray-300">
-          <p className="text-xl text-gray-500">
+        <div className="mt-6 flex min-h-[250px] items-center justify-center rounded-lg border border-gray-300 px-4 sm:mt-8 sm:min-h-[300px]">
+          <p className="text-center text-lg text-gray-500 sm:text-xl">
             No item added to the cart
           </p>
         </div>
@@ -26,7 +26,7 @@ const CartComponent = ({
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => navigate("/")}
-            className="rounded-lg bg-[#4b6800] px-10 py-4 font-semibold text-white hover:bg-[#3d5500]"
+            className="w-full rounded-lg bg-[#4b6800] px-6 py-3 font-semibold text-white hover:bg-[#3d5500] sm:w-auto sm:px-10 sm:py-4"
           >
             Continue Shopping
           </button>
@@ -38,101 +38,161 @@ const CartComponent = ({
 
   // Calculate subtotal
   const itemSubtotal = cartItems.reduce(
-    (total, item) =>
-      total + item.price * item.quantity,
+    (total, item) => total + item.price * item.quantity,
     0
   );
 
   const serviceFee = 200;
-
   const subtotal = itemSubtotal + serviceFee;
 
   return (
-    <main className="mx-auto max-w-[1250px] px-5 py-8 md:px-8">
+    <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:px-10 lg:py-10 xl:px-12">
 
-      {/* PAGE TITLE */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-10">
 
-        {/* LEFT */}
-        <div>
+        {/* ================================================= */}
+        {/* LEFT - CART ITEMS */}
+        {/* ================================================= */}
 
-          <h1 className="mb-6 text-3xl font-semibold text-[#4b6800]">
+        <div className="min-w-0">
+
+          <h1 className="mb-5 text-2xl font-semibold text-[#4b6800] sm:mb-6 sm:text-3xl">
             Shopping Cart
           </h1>
 
-          <div className="rounded-xl border border-gray-400">
+          <div className="overflow-hidden rounded-xl border border-gray-300">
 
             {cartItems.map((item, index) => (
               <div
                 key={item.id}
                 className={`
-                  flex
-                  min-h-[180px]
-                  items-center
-                  gap-5
-                  px-5
-                  py-5
+                  flex flex-col gap-4 p-4
+                  sm:flex-row sm:items-center sm:gap-5 sm:p-5
+                  md:p-6
+                  lg:gap-6
 
-                  ${index !== cartItems.length - 1
-                    ? "border-b border-gray-400"
-                    : ""}
+                  ${
+                    index !== cartItems.length - 1
+                      ? "border-b border-gray-300"
+                      : ""
+                  }
                 `}
               >
 
-                {/* IMAGE */}
-                <div className="flex h-[140px] w-[140px] shrink-0 items-center justify-center">
+                {/* ========================================= */}
+                {/* PRODUCT IMAGE */}
+                {/* ========================================= */}
+
+                <div
+                  className="
+                    flex h-[120px] w-[120px] shrink-0
+                    items-center justify-center
+                    self-center
+                    sm:h-[125px] sm:w-[125px]
+                    sm:self-auto
+                    md:h-[140px] md:w-[140px]
+                    lg:h-[150px] lg:w-[150px]
+                  "
+                >
                   <img
-                    src={
-                      item.images?.[0] ||
-                      item.image
-                    }
+                    src={item.images?.[0] || item.image}
                     alt={item.name}
                     className="h-full w-full object-contain"
                   />
                 </div>
 
+                {/* ========================================= */}
                 {/* PRODUCT DETAILS */}
-                <div className="flex flex-1 flex-col">
+                {/* ========================================= */}
 
-                  <h2 className="max-w-[550px] text-lg font-medium leading-7 text-[#4b6800]">
+                <div className="flex min-w-0 flex-1 flex-col">
+
+                  <h2
+                    className="
+                      text-base font-medium leading-6 text-[#4b6800]
+                      sm:text-lg sm:leading-7
+                    "
+                  >
                     {item.name}
                   </h2>
 
-                  <p className="mt-1 max-w-[550px] text-base text-[#4b6800]">
+                  <p
+                    className="
+                      mt-1 line-clamp-3
+                      text-sm leading-5 text-[#4b6800]
+                      sm:text-base sm:leading-6
+                    "
+                  >
                     {item.description}
                   </p>
 
+                  {/* ======================================= */}
                   {/* QUANTITY */}
-                  <div className="mt-5 flex h-12 w-[190px] overflow-hidden rounded-lg">
+                  {/* ======================================= */}
+
+                  <div
+                    className="
+                      mt-4 flex h-10 w-[150px] overflow-hidden rounded-lg
+                      sm:mt-5 sm:h-11 sm:w-[170px]
+                      md:h-12 md:w-[180px]
+                      lg:w-[190px]
+                    "
+                  >
 
                     <button
-                      onClick={() =>
-                        decreaseQuantity(item.id)
-                      }
-                      className="flex w-14 items-center justify-center bg-[#4b6800] text-white hover:bg-[#3d5500]"
+                      onClick={() => decreaseQuantity(item.id)}
+                      className="
+                        flex w-11 items-center justify-center
+                        bg-[#4b6800] text-white
+                        hover:bg-[#3d5500]
+                        sm:w-12
+                        md:w-14
+                      "
                     >
-                      <Minus size={22} />
+                      <Minus size={18} className="sm:size-5 md:size-[22px]" />
                     </button>
 
-                    <span className="flex flex-1 items-center justify-center border-y border-gray-300 text-xl text-[#4b6800]">
+                    <span
+                      className="
+                        flex flex-1 items-center justify-center
+                        border-y border-gray-300
+                        text-lg text-[#4b6800]
+                        sm:text-xl
+                      "
+                    >
                       {item.quantity}
                     </span>
 
                     <button
-                      onClick={() =>
-                        increaseQuantity(item.id)
-                      }
-                      className="flex w-14 items-center justify-center bg-[#4b6800] text-white hover:bg-[#3d5500]"
+                      onClick={() => increaseQuantity(item.id)}
+                      className="
+                        flex w-11 items-center justify-center
+                        bg-[#4b6800] text-white
+                        hover:bg-[#3d5500]
+                        sm:w-12
+                        md:w-14
+                      "
                     >
-                      <Plus size={22} />
+                      <Plus size={18} className="sm:size-5 md:size-[22px]" />
                     </button>
 
                   </div>
 
                 </div>
 
+                {/* ========================================= */}
                 {/* PRICE */}
-                <div className="shrink-0 text-xl font-medium text-[#4b6800]">
+                {/* ========================================= */}
+
+                <div
+                  className="
+                    flex shrink-0 items-center
+                    text-lg font-medium text-[#4b6800]
+                    sm:self-start
+                    md:text-xl
+                    lg:self-center
+                  "
+                >
                   ₹ {(item.price * item.quantity).toFixed(2)}
                 </div>
 
@@ -141,71 +201,103 @@ const CartComponent = ({
 
           </div>
 
+          {/* ============================================= */}
           {/* CONTINUE SHOPPING */}
-          <div className="mt-5 flex justify-end">
+          {/* ============================================= */}
 
+          <div className="mt-5 flex justify-center sm:justify-end">
             <button
               onClick={() => navigate("/")}
-              className="rounded-lg bg-[#4b6800] px-10 py-4 font-semibold text-white hover:bg-[#3d5500]"
+              className="
+                w-full rounded-lg
+                bg-[#4b6800]
+                px-8 py-3
+                font-semibold text-white
+                hover:bg-[#3d5500]
+                sm:w-auto sm:px-10 sm:py-4
+              "
             >
               Continue Shopping
             </button>
-
           </div>
 
         </div>
 
+        {/* ================================================= */}
         {/* RIGHT - SUMMARY */}
-        <div>
+        {/* ================================================= */}
 
-          <h2 className="mb-6 text-3xl font-semibold text-[#4b6800]">
+        <div className="w-full">
+
+          <h2 className="mb-5 text-2xl font-semibold text-[#4b6800] sm:mb-6 sm:text-3xl">
             Summary
           </h2>
 
-          <div className="rounded-xl border border-gray-300 p-5 shadow-sm">
+          <div className="rounded-xl border border-gray-300 p-4 shadow-sm sm:p-5 md:p-6">
 
+            {/* ============================================= */}
             {/* ITEM SUBTOTAL */}
-            <div className="flex justify-between text-lg">
+            {/* ============================================= */}
+
+            <div className="flex items-center justify-between gap-4 text-base sm:text-lg">
               <span className="text-[#4b6800]">
                 Item Subtotal
               </span>
 
-              <span className="font-semibold text-[#4b6800]">
+              <span className="shrink-0 font-semibold text-[#4b6800]">
                 ₹ {itemSubtotal.toFixed(2)}
               </span>
             </div>
 
+            {/* ============================================= */}
             {/* SERVICE FEE */}
-            <div className="mt-7 flex justify-between text-lg">
+            {/* ============================================= */}
+
+            <div className="mt-5 flex items-center justify-between gap-4 text-base sm:mt-7 sm:text-lg">
               <span className="text-[#4b6800]">
                 Service Fee
               </span>
 
-              <span className="font-semibold text-[#4b6800]">
+              <span className="shrink-0 font-semibold text-[#4b6800]">
                 ₹ {serviceFee.toFixed(2)}
               </span>
             </div>
 
+            {/* ============================================= */}
             {/* TOTAL */}
-            <div className="mt-7 flex justify-between text-lg">
+            {/* ============================================= */}
+
+            <div className="mt-5 flex items-center justify-between gap-4 border-t border-gray-200 pt-5 text-base sm:mt-7 sm:pt-6 sm:text-lg">
               <span className="text-[#4b6800]">
                 Subtotal
               </span>
 
-              <span className="font-semibold text-[#4b6800]">
+              <span className="shrink-0 font-semibold text-[#4b6800]">
                 ₹ {subtotal.toFixed(2)}
               </span>
             </div>
 
+            {/* ============================================= */}
             {/* CHECKOUT */}
+            {/* ============================================= */}
+
             <button
-              className="mt-8 w-full rounded-lg bg-[#4b6800] py-4 font-semibold text-white hover:bg-[#3d5500]"
+              className="
+                mt-6 w-full rounded-lg
+                bg-[#4b6800] py-3
+                font-semibold text-white
+                hover:bg-[#3d5500]
+                sm:mt-8 sm:py-4
+              "
             >
               Go to Check Out
             </button>
 
+            {/* ============================================= */}
             {/* TERMS */}
-            <p className="mt-5 text-sm leading-5 text-gray-700">
+            {/* ============================================= */}
+
+            <p className="mt-4 text-xs leading-5 text-gray-700 sm:mt-5 sm:text-sm">
               By placing your order, you agree to be
               bound by the Noon Herb{" "}
               <span className="text-[#4b6800] underline">
@@ -214,31 +306,50 @@ const CartComponent = ({
               and{" "}
               <span className="text-[#4b6800] underline">
                 Privacy Policy
-              </span>.
+              </span>
+              .
             </p>
 
+            {/* ============================================= */}
             {/* PROMO */}
-            <h3 className="mt-8 text-2xl font-medium text-[#4b6800]">
+            {/* ============================================= */}
+
+            <h3 className="mt-7 text-xl font-medium text-[#4b6800] sm:mt-8 sm:text-2xl">
               Add Promo or Gift Card
             </h3>
 
-            <label className="mt-6 block text-lg text-[#4b6800]">
+            <label className="mt-5 block text-base text-[#4b6800] sm:mt-6 sm:text-lg">
               Email Address
             </label>
 
             <input
               type="email"
               placeholder="Enter your Email Address"
-              className="mt-3 w-full rounded-lg border border-gray-200 px-5 py-4 outline-none shadow-sm focus:border-[#4b6800]"
+              className="
+                mt-3 w-full rounded-lg
+                border border-gray-200
+                px-4 py-3
+                text-sm
+                outline-none
+                shadow-sm
+                focus:border-[#4b6800]
+                sm:px-5 sm:py-4 sm:text-base
+              "
             />
 
             <button
-              className="mt-5 w-full rounded-lg bg-[#4b6800] py-4 font-semibold text-white hover:bg-[#3d5500]"
+              className="
+                mt-4 w-full rounded-lg
+                bg-[#4b6800] py-3
+                font-semibold text-white
+                hover:bg-[#3d5500]
+                sm:mt-5 sm:py-4
+              "
             >
               Redeem
             </button>
 
-            <p className="mt-5 text-sm text-[#4b6800]">
+            <p className="mt-4 text-xs text-[#4b6800] sm:mt-5 sm:text-sm">
               Terms & Conditions apply
             </p>
 
