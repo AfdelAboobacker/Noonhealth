@@ -1,6 +1,6 @@
 const recentProducts = [
   {
-    id: 1,
+    id: 101,
     name: "Lorem Ipsum Product 1",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -9,8 +9,9 @@ const recentProducts = [
     oldPrice: 1500,
     discount: 17,
   },
+
   {
-    id: 2,
+    id: 102,
     name: "Lorem Ipsum Product 2",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -19,8 +20,9 @@ const recentProducts = [
     oldPrice: 1100,
     discount: 18,
   },
+
   {
-    id: 3,
+    id: 103,
     name: "Lorem Ipsum Product 3",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -29,8 +31,9 @@ const recentProducts = [
     oldPrice: 1400,
     discount: 18,
   },
+
   {
-    id: 4,
+    id: 104,
     name: "Lorem Ipsum Product 4",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -39,8 +42,9 @@ const recentProducts = [
     oldPrice: 1600,
     discount: 13,
   },
+
   {
-    id: 5,
+    id: 105,
     name: "Lorem Ipsum Product 5",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -49,8 +53,9 @@ const recentProducts = [
     oldPrice: 950,
     discount: 21,
   },
+
   {
-    id: 6,
+    id: 106,
     name: "Lorem Ipsum Product 6",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
@@ -59,8 +64,9 @@ const recentProducts = [
     oldPrice: 1550,
     discount: 16,
   },
+
   {
-    id: 7,
+    id: 107,
     name: "Lorem Ipsum Product 7",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",

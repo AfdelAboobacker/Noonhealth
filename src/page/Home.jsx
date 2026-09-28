@@ -8,17 +8,24 @@ import Review from "../components/Review";
 import Subscribe from "../components/Subscribe";
 import Footer from "../components/Footer";
 
-export const Home = () => {
+export const Home = ({ onAddToCart }) => {
   return (
     <div>
       <Navbar />
+
       <Banner />
-      <NewArrivals />
-      <RecentProducts />
+
+      <NewArrivals onAddToCart={onAddToCart} />
+
+      <RecentProducts onAddToCart={onAddToCart} />
+
       <Banner2 />
+
       <Review />
-      <Subscribe/>
-      <Footer/>
+
+      <Subscribe />
+
+      <Footer />
     </div>
   );
 };

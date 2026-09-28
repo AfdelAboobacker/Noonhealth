@@ -1,14 +1,14 @@
 import ProductCarousel from "./ProductCarousel";
 import recentProducts from "../data/recent";
 
-const RecentProducts = ({ onAddToCart }) => {
+const RelatedItem = ({ onAddToCart }) => {
   return (
     <ProductCarousel
-      title="Best Seller"
+      title="Related Items"
       products={recentProducts}
       onAddToCart={onAddToCart}
     />
   );
 };
 
-export default RecentProducts;
+export default RelatedItem;

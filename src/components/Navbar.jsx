@@ -8,8 +8,10 @@ import {
   X,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -48,7 +50,10 @@ const Navbar = () => {
       {/* Main Navbar */}
       <div className="h-[75px] lg:h-[90px] flex items-center px-5 lg:px-8">
         {/* Logo */}
-        <div className="flex items-center gap-2 lg:gap-3 shrink-0">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 lg:gap-3 shrink-0 cursor-pointer"
+        >
           <img
             src="/images/mainlogo/nh-logo-white.png"
             alt="Noon Herb"
@@ -58,7 +63,7 @@ const Navbar = () => {
           <span className="text-white text-xl lg:text-2xl font-medium whitespace-nowrap">
             Noon Herb
           </span>
-        </div>
+        </button>
         {/* Search - Desktop only */}
         <div className="hidden lg:flex h-[55px] flex-1 max-w-[890px] ml-10">
           {/* Search Input */}
@@ -88,13 +93,16 @@ const Navbar = () => {
           </button>
 
           {/* Account */}
-          <button className="flex items-center gap-3 text-xl">
+          <button className="flex items-center gap-3 text-xl  hover:text-lime-500 transition-colors duration-300">
             <User className="w-9 h-9" />
             <span>My Account</span>
           </button>
 
           {/* Cart */}
-          <button className="flex items-center gap-3 text-xl">
+          <button
+            onClick={() => navigate("/cart")}
+            className="flex items-center gap-3 text-xl hover:text-lime-500 transition-colors duration-300"
+          >
             <ShoppingCart className="w-9 h-9" />
             <span>My Cart</span>
           </button>
@@ -135,7 +143,10 @@ const Navbar = () => {
               My Account
             </button>
 
-            <button className="flex items-center gap-3 text-lg">
+            <button
+              onClick={() => navigate("/cart")}
+              className="flex items-center gap-3 text-lg"
+            >
               <ShoppingCart className="w-6 h-6" />
               My Cart
             </button>

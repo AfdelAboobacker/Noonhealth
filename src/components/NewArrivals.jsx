@@ -1,16 +1,12 @@
 import ProductCarousel from "./ProductCarousel";
 import newArrivals from "../data/newarrival";
 
-const NewArrivals = () => {
-  const handleAddToCart = (product) => {
-    console.log("Added to cart:", product);
-  };
-
+const NewArrivals = ({ onAddToCart }) => {
   return (
     <ProductCarousel
       title="New Arrivals"
       products={newArrivals}
-      onAddToCart={handleAddToCart}
+      onAddToCart={onAddToCart}
     />
   );
 };

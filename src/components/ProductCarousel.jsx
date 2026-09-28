@@ -1,29 +1,25 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "./ProductCard";
 
-const ProductCarousel = ({ title, products = [], onAddToCart }) => {
+const ProductCarousel = ({
+  title,
+  products = [],
+  onAddToCart,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(4);
+  const [touchStart, setTouchStart] = useState(null);
 
-  // Dragging states
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
-
-  const startX = useRef(0);
-
-  // Responsive number of visible products
+  // RESPONSIVE NUMBER OF PRODUCTS
   useEffect(() => {
     const updateVisibleProducts = () => {
       if (window.innerWidth < 640) {
-        // Small screen
         setVisibleProducts(2);
       } else if (window.innerWidth < 1024) {
-        // Medium screen
         setVisibleProducts(3);
       } else {
-        // Large screen
         setVisibleProducts(4);
       }
     };
@@ -33,110 +29,87 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
     window.addEventListener("resize", updateVisibleProducts);
 
     return () => {
-      window.removeEventListener("resize", updateVisibleProducts);
+      window.removeEventListener(
+        "resize",
+        updateVisibleProducts
+      );
     };
   }, []);
 
-  // Maximum carousel position
-  const maxIndex = Math.max(products.length - visibleProducts, 0);
+  // MAXIMUM CAROUSEL POSITION
+  const maxIndex = Math.max(
+    products.length - visibleProducts,
+    0
+  );
 
-  // Favorite
+  // FAVORITE
   const handleFavorite = (product) => {
     setFavorites((prev) =>
       prev.includes(product.id)
         ? prev.filter((id) => id !== product.id)
-        : [...prev, product.id],
+        : [...prev, product.id]
     );
   };
 
-  // Previous
+  // PREVIOUS
   const handlePrevious = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0));
+    setCurrentIndex((prev) =>
+      Math.max(prev - 1, 0)
+    );
   };
 
-  // Next
+  // NEXT
   const handleNext = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
+    setCurrentIndex((prev) =>
+      Math.min(prev + 1, maxIndex)
+    );
   };
 
-  // Make sure index is valid when screen size changes
+  // KEEP INDEX VALID
   useEffect(() => {
-    setCurrentIndex((prev) => Math.min(prev, maxIndex));
+    setCurrentIndex((prev) =>
+      Math.min(prev, maxIndex)
+    );
   }, [visibleProducts, maxIndex]);
 
-  // =========================
-  // TOUCH / POINTER START
-  // =========================
-
-  const handlePointerDown = (e) => {
-    startX.current = e.clientX;
-
-    setIsDragging(true);
-    setDragOffset(0);
-
-    e.currentTarget.setPointerCapture(e.pointerId);
+  // TOUCH START
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX);
   };
 
-  // =========================
-  // TOUCH / POINTER MOVE
-  // =========================
+  // TOUCH END
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
 
-  const handlePointerMove = (e) => {
-    if (!isDragging) return;
+    const touchEnd = e.changedTouches[0].clientX;
 
-    const currentX = e.clientX;
-    const difference = currentX - startX.current;
-
-    setDragOffset(difference);
-  };
-
-  // =========================
-  // TOUCH / POINTER END
-  // =========================
-
-  const handlePointerUp = (e) => {
-    if (!isDragging) return;
-
-    const difference = e.clientX - startX.current;
+    const swipeDistance =
+      touchStart - touchEnd;
 
     const minimumSwipeDistance = 50;
 
-    if (difference < -minimumSwipeDistance) {
-      // Swipe left
+    // SWIPE LEFT
+    if (swipeDistance > minimumSwipeDistance) {
       handleNext();
-    } else if (difference > minimumSwipeDistance) {
-      // Swipe right
+    }
+
+    // SWIPE RIGHT
+    if (swipeDistance < -minimumSwipeDistance) {
       handlePrevious();
     }
 
-    setIsDragging(false);
-    setDragOffset(0);
-
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // Ignore if pointer capture was already released
-    }
+    setTouchStart(null);
   };
 
-  // Cancel drag
-  const handlePointerCancel = () => {
-    setIsDragging(false);
-    setDragOffset(0);
-  };
-
+  // NO PRODUCTS
   if (!products.length) {
     return null;
   }
 
-  // Normal position
-  const normalPosition =
-    currentIndex * (100 / visibleProducts);
-
   return (
     <section className="w-full py-8 sm:py-10">
 
-      {/* Title */}
+      {/* TITLE */}
       <h2
         className="
           mb-6
@@ -154,7 +127,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
         {title}
       </h2>
 
-      {/* Carousel Container */}
+      {/* CAROUSEL CONTAINER */}
       <div
         className="
           relative
@@ -171,7 +144,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
         "
       >
 
-        {/* Previous Button */}
+        {/* PREVIOUS BUTTON */}
         <button
           type="button"
           onClick={handlePrevious}
@@ -182,17 +155,14 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
             left-0
             top-1/2
             z-20
-
             flex
             h-9
             w-9
             -translate-y-1/2
             items-center
             justify-center
-
             rounded-full
             border-2
-
             transition-all
             duration-200
 
@@ -217,40 +187,24 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
           />
         </button>
 
-        {/* Products */}
+        {/* PRODUCTS */}
         <div
-          className="
-            overflow-hidden
-            touch-pan-y
-            select-none
-          "
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
+          className="touch-pan-y overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <div
-            className={`
+            className="
               flex
-              ${
-                isDragging
-                  ? "cursor-grabbing"
-                  : "cursor-grab"
-              }
-              ${
-                isDragging
-                  ? ""
-                  : "transition-transform duration-500 ease-out"
-              }
-            `}
+              transition-transform
+              duration-500
+              ease-in-out
+            "
             style={{
-              transform: `
-                translateX(
-                  calc(
-                    -${normalPosition}% + ${dragOffset}px
-                  )
-                )
-              `,
+              transform: `translateX(-${
+                currentIndex *
+                (100 / visibleProducts)
+              }%)`,
             }}
           >
             {products.map((product) => (
@@ -271,7 +225,9 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
               >
                 <ProductCard
                   product={product}
-                  isFavorite={favorites.includes(product.id)}
+                  isFavorite={favorites.includes(
+                    product.id
+                  )}
                   onFavorite={handleFavorite}
                   onAddToCart={onAddToCart}
                 />
@@ -280,7 +236,7 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
           </div>
         </div>
 
-        {/* Next Button */}
+        {/* NEXT BUTTON */}
         <button
           type="button"
           onClick={handleNext}
@@ -291,17 +247,14 @@ const ProductCarousel = ({ title, products = [], onAddToCart }) => {
             right-0
             top-1/2
             z-20
-
             flex
             h-9
             w-9
             -translate-y-1/2
             items-center
             justify-center
-
             rounded-full
             border-2
-
             transition-all
             duration-200
 

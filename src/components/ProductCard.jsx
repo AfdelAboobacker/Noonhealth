@@ -1,4 +1,5 @@
 import { Heart, ShoppingBag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
   product,
@@ -6,11 +7,39 @@ const ProductCard = ({
   onFavorite,
   onAddToCart,
 }) => {
+  const navigate = useNavigate();
+
   if (!product) return null;
 
+  const handleProductClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+
+    // Send product to App.jsx cart
+    onAddToCart?.(product, 1);
+  };
+
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-[16px] bg-[#e5edc8] sm:rounded-[18px] lg:rounded-[20px]">
-      {/* Product Image */}
+    <div
+      onClick={handleProductClick}
+      className="
+        flex
+        h-full
+        w-full
+        cursor-pointer
+        flex-col
+        overflow-hidden
+        rounded-[16px]
+        bg-[#e5edc8]
+
+        sm:rounded-[18px]
+        lg:rounded-[20px]
+      "
+    >
+      {/* PRODUCT IMAGE */}
       <div className="relative aspect-square w-full overflow-hidden bg-white">
         <img
           src={product.image}
@@ -18,35 +47,71 @@ const ProductCard = ({
           className="h-full w-full object-cover"
         />
 
-        {/* Favorite */}
+        {/* FAVORITE BUTTON */}
         <button
           type="button"
-          onClick={() => onFavorite?.(product)}
-          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          className="absolute right-2 top-2 z-10 transition-transform duration-200 hover:scale-110 sm:right-3 sm:top-3 lg:right-4 lg:top-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFavorite?.(product);
+          }}
+          aria-label={
+            isFavorite
+              ? "Remove from favorites"
+              : "Add to favorites"
+          }
+          className="
+            absolute
+            right-2
+            top-2
+            z-10
+            transition-transform
+            duration-200
+            hover:scale-110
+
+            sm:right-3
+            sm:top-3
+
+            lg:right-4
+            lg:top-4
+          "
         >
           <Heart
             size={22}
             strokeWidth={2}
             className={
-              isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
+              isFavorite
+                ? "fill-red-500 text-red-500"
+                : "text-red-500"
             }
           />
         </button>
       </div>
 
-      {/* Product Details */}
-      <div className="flex flex-1 flex-col px-2.5 pb-3 pt-2.5 sm:px-3 sm:pb-4 sm:pt-3">
-        {/* Description */}
+      {/* PRODUCT DETAILS */}
+      <div
+        className="
+          flex
+          flex-1
+          flex-col
+          px-2.5
+          pb-3
+          pt-2.5
+
+          sm:px-3
+          sm:pb-4
+          sm:pt-3
+        "
+      >
+        {/* DESCRIPTION */}
         <p
           className="
+            line-clamp-2
             h-[36px]
             overflow-hidden
             text-[11px]
             font-semibold
             leading-[18px]
             text-black
-            line-clamp-2
 
             sm:h-[40px]
             sm:text-[13px]
@@ -60,8 +125,20 @@ const ProductCard = ({
           {product.description}
         </p>
 
-        {/* Price */}
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:mt-2 sm:gap-x-3">
+        {/* PRICE */}
+        <div
+          className="
+            mt-1.5
+            flex
+            flex-wrap
+            items-center
+            gap-x-2
+            gap-y-0.5
+
+            sm:mt-2
+            sm:gap-x-3
+          "
+        >
           <span className="text-[11px] font-bold text-black sm:text-[13px] lg:text-[14px]">
             {product.price} INR
           </span>
@@ -75,10 +152,10 @@ const ProductCard = ({
           </span>
         </div>
 
-        {/* Add To Cart */}
+        {/* ADD TO CART */}
         <button
           type="button"
-          onClick={() => onAddToCart?.(product)}
+          onClick={handleAddToCart}
           className="
             mt-auto
             flex
