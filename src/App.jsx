@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { Productview } from "./page/ProductView";
+
 import { Home } from "./page/Home";
 import Cart from "./page/Cart";
 import ScrollToTop from "./components/ScrollToTop";
+import { Productview } from "./page/ProductView";
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
