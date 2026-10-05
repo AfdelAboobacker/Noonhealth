@@ -6,6 +6,7 @@ import Cart from "./page/Cart";
 import ScrollToTop from "./components/ScrollToTop";
 import { Productview } from "./page/Productview";
 import { Seeall } from "./page/Seeall";
+import SignIn from "./page/SignIn";
 
 const App = () => {
   // LOAD CART FROM LOCAL STORAGE
@@ -23,7 +24,9 @@ const App = () => {
   // ADD TO CART
   const handleAddToCart = (product, quantity = 1) => {
     setCartItems((prev) => {
-      const existingProduct = prev.find((item) => item.id === product.id);
+      const existingProduct = prev.find(
+        (item) => item.id === product.id
+      );
 
       if (existingProduct) {
         return prev.map((item) =>
@@ -32,7 +35,7 @@ const App = () => {
                 ...item,
                 quantity: item.quantity + quantity,
               }
-            : item,
+            : item
         );
       }
 
@@ -55,8 +58,8 @@ const App = () => {
               ...item,
               quantity: item.quantity + 1,
             }
-          : item,
-      ),
+          : item
+      )
     );
   };
 
@@ -70,9 +73,9 @@ const App = () => {
                 ...item,
                 quantity: item.quantity - 1,
               }
-            : item,
+            : item
         )
-        .filter((item) => item.quantity > 0),
+        .filter((item) => item.quantity > 0)
     );
   };
 
@@ -82,12 +85,17 @@ const App = () => {
 
       <Routes>
         {/* HOME */}
-        <Route path="/" element={<Home onAddToCart={handleAddToCart} />} />
+        <Route
+          path="/"
+          element={<Home onAddToCart={handleAddToCart} />}
+        />
 
         {/* PRODUCT VIEW */}
         <Route
           path="/product/:id"
-          element={<Productview onAddToCart={handleAddToCart} />}
+          element={
+            <Productview onAddToCart={handleAddToCart} />
+          }
         />
 
         {/* CART */}
@@ -101,12 +109,19 @@ const App = () => {
             />
           }
         />
-         <Route
+
+        {/* SEE ALL */}
+        <Route
           path="/seeall"
           element={<Seeall />}
         />
+
+        {/* SIGN IN */}
+        <Route
+          path="/signin"
+          element={<SignIn />}
+        />
       </Routes>
-      
     </BrowserRouter>
   );
 };
