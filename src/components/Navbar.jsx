@@ -144,10 +144,16 @@ const Navbar = () => {
               Wish List
             </button>
 
-            <button className="flex items-center gap-3 text-lg">
-              <User className="w-6 h-6" />
-              My Account
-            </button>
+              <button
+            onClick={() => {
+              setMenuOpen(false);
+              navigate("/signin");
+            }}
+            className="flex items-center gap-3 text-lg"
+          >
+            <User className="w-6 h-6" />
+            My Account
+          </button>
 
             <button
               onClick={() => navigate("/cart")}
