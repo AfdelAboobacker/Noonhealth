@@ -20,7 +20,6 @@ const SignIn = () => {
     setError("");
     setSuccess("");
 
-    // Find matching user
     const user = users.find(
       (item) =>
         item.email.toLowerCase() === email.trim().toLowerCase() &&
@@ -32,30 +31,26 @@ const SignIn = () => {
       return;
     }
 
-    // Store logged-in user
+    const loggedInUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+
     if (rememberMe) {
       localStorage.setItem(
         "noonHerbUser",
-        JSON.stringify({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        })
+        JSON.stringify(loggedInUser)
       );
     } else {
       sessionStorage.setItem(
         "noonHerbUser",
-        JSON.stringify({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        })
+        JSON.stringify(loggedInUser)
       );
     }
 
     setSuccess("Sign in successful!");
 
-    // Go to home page
     setTimeout(() => {
       navigate("/");
     }, 700);
@@ -63,36 +58,112 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* NAVBAR */}
+
+      {/* ================= NAVBAR ================= */}
       <SignInNavbar />
 
-      {/* MAIN CONTENT */}
+      {/* ================= MAIN CONTENT ================= */}
       <main className="flex-1">
-        <div className="max-w-[1050px] mx-auto px-6 py-16 md:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10 md:gap-16">
 
-            {/* LEFT - TEA IMAGE */}
-            <div className="flex justify-center items-center">
+        <div
+          className="
+            w-full
+            max-w-[1250px]
+            mx-auto
+            px-5
+            sm:px-6
+            md:px-8
+            lg:px-10
+            xl:px-14
+            py-12
+            sm:py-14
+            md:py-16
+            lg:py-20
+            xl:py-24
+          "
+        >
+
+          <div
+            className="
+              grid
+              grid-cols-1
+              md:grid-cols-2
+              items-center
+              gap-8
+              md:gap-10
+              lg:gap-16
+              xl:gap-24
+            "
+          >
+
+            {/* ================= LEFT - TEA IMAGE ================= */}
+            <div
+              className="
+                hidden
+                md:flex
+                justify-center
+                items-center
+                w-full
+              "
+            >
               <img
                 src="/images/signin/Tea_cup.png"
                 alt="Noon Herb Tea"
-                className="w-full max-w-[450px] object-contain"
+                className="
+                  w-full
+                  max-w-[400px]
+                  lg:max-w-[450px]
+                  xl:max-w-[500px]
+                  h-auto
+                  object-contain
+                "
               />
             </div>
 
-            {/* RIGHT - SIGN IN FORM */}
-            <div className="w-full max-w-[390px] mx-auto md:mx-0">
-              <h1 className="text-[#486400] text-2xl md:text-[24px] font-bold mb-4">
+            {/* ================= RIGHT - SIGN IN FORM ================= */}
+            <div
+              className="
+                w-full
+                max-w-[390px]
+                sm:max-w-[420px]
+                md:max-w-[390px]
+                lg:max-w-[400px]
+                xl:max-w-[410px]
+                mx-auto
+                md:mx-0
+              "
+            >
+
+              {/* Heading */}
+              <h1
+                className="
+                  text-[#486400]
+                  text-2xl
+                  md:text-[24px]
+                  font-bold
+                  mb-4
+                "
+              >
                 Sign in to Noon Herb
               </h1>
 
-              <p className="text-gray-600 text-sm leading-5 mb-8">
+              {/* Description */}
+              <p
+                className="
+                  text-gray-600
+                  text-sm
+                  leading-5
+                  mb-7
+                  sm:mb-8
+                "
+              >
                 Welcome back to Noon Herb! Enter your email to get
                 started.
               </p>
 
               <form onSubmit={handleSubmit}>
-                {/* EMAIL */}
+
+                {/* ================= EMAIL ================= */}
                 <div className="mb-2">
                   <input
                     type="email"
@@ -100,14 +171,24 @@ const SignIn = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full h-[43px] px-3 rounded-lg border border-gray-200
-                    shadow-sm outline-none text-sm text-gray-700
-                    placeholder:text-gray-400
-                    focus:border-[#9abb35]"
+                    className="
+                      w-full
+                      h-[43px]
+                      px-3
+                      rounded-lg
+                      border
+                      border-gray-200
+                      shadow-sm
+                      outline-none
+                      text-sm
+                      text-gray-700
+                      placeholder:text-gray-400
+                      focus:border-[#9abb35]
+                    "
                   />
                 </div>
 
-                {/* PASSWORD */}
+                {/* ================= PASSWORD ================= */}
                 <div className="mb-3">
                   <input
                     type="password"
@@ -115,15 +196,35 @@ const SignIn = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full h-[43px] px-3 rounded-lg border border-gray-200
-                    shadow-sm outline-none text-sm text-gray-700
-                    placeholder:text-gray-400
-                    focus:border-[#9abb35]"
+                    className="
+                      w-full
+                      h-[43px]
+                      px-3
+                      rounded-lg
+                      border
+                      border-gray-200
+                      shadow-sm
+                      outline-none
+                      text-sm
+                      text-gray-700
+                      placeholder:text-gray-400
+                      focus:border-[#9abb35]
+                    "
                   />
                 </div>
 
-                {/* REMEMBER + FORGOT */}
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-5">
+                {/* ================= REMEMBER + FORGOT ================= */}
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+                    text-xs
+                    text-gray-600
+                    mb-5
+                  "
+                >
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -131,18 +232,32 @@ const SignIn = () => {
                       onChange={(e) =>
                         setRememberMe(e.target.checked)
                       }
-                      className="w-5 h-5 rounded border-gray-300 accent-[#486400]"
+                      className="
+                        w-5
+                        h-5
+                        rounded
+                        border-gray-300
+                        accent-[#486400]
+                        shrink-0
+                      "
                     />
 
-                    <span>Remember me</span>
+                    <span className="whitespace-nowrap">
+                      Remember me
+                    </span>
                   </label>
 
                   <button
                     type="button"
                     onClick={() =>
-                      alert("Please contact Noon Herb to reset your password.")
+                      alert(
+                        "Please contact Noon Herb to reset your password."
+                      )
                     }
-                    className="hover:text-[#486400]"
+                    className="
+                      hover:text-[#486400]
+                      text-right
+                    "
                   >
                     Forgot password?{" "}
                     <span className="text-[#486400] font-medium">
@@ -151,37 +266,49 @@ const SignIn = () => {
                   </button>
                 </div>
 
-                {/* ERROR */}
+                {/* ================= ERROR ================= */}
                 {error && (
                   <div className="text-red-600 text-sm mb-3">
                     {error}
                   </div>
                 )}
 
-                {/* SUCCESS */}
+                {/* ================= SUCCESS ================= */}
                 {success && (
                   <div className="text-green-700 text-sm mb-3">
                     {success}
                   </div>
                 )}
 
-                {/* SIGN IN BUTTON */}
+                {/* ================= SIGN IN BUTTON ================= */}
                 <button
                   type="submit"
-                  className="w-full h-[41px] rounded-lg bg-[#486400]
-                  hover:bg-[#3d5500] text-white text-sm font-medium
-                  transition-colors"
+                  className="
+                    w-full
+                    h-[41px]
+                    rounded-lg
+                    bg-[#486400]
+                    hover:bg-[#3d5500]
+                    text-white
+                    text-sm
+                    font-medium
+                    transition-colors
+                  "
                 >
                   Sign In
                 </button>
               </form>
 
-              {/* SIGN UP */}
+              {/* ================= SIGN UP ================= */}
               <p className="text-gray-600 text-xs mt-5">
                 Don't have an account?{" "}
                 <Link
                   to="/register"
-                  className="text-[#486400] font-medium hover:underline"
+                  className="
+                    text-[#486400]
+                    font-medium
+                    hover:underline
+                  "
                 >
                   Sign Up
                 </Link>
@@ -191,7 +318,7 @@ const SignIn = () => {
         </div>
       </main>
 
-      {/* EXISTING FOOTER */}
+      {/* ================= FOOTER ================= */}
       <Footer />
     </div>
   );

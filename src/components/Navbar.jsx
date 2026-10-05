@@ -93,9 +93,15 @@ const Navbar = () => {
           </button>
 
           {/* Account */}
-          <button className="flex items-center gap-3 text-xl  hover:text-lime-500 transition-colors duration-300">
-            <User className="w-9 h-9" />
-            <span>My Account</span>
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              navigate("/signin");
+            }}
+            className="flex items-center gap-3 text-lg"
+          >
+            <User className="w-6 h-6" />
+            My Account
           </button>
 
           {/* Cart */}
