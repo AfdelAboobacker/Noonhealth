@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "./ProductCard";
 
@@ -7,6 +8,8 @@ const ProductCarousel = ({
   products = [],
   onAddToCart,
 }) => {
+  const navigate = useNavigate();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(4);
@@ -280,6 +283,39 @@ const ProductCarousel = ({
         </button>
 
       </div>
+
+      {/* SEE ALL BUTTON */}
+      <div className="mt-6 flex justify-center sm:mt-8">
+        <button
+          type="button"
+          onClick={() => navigate("/seeall")}
+          className="
+            rounded-full
+            border-2
+            border-[#4b6800]
+            bg-white
+            px-6
+            py-2
+            text-sm
+            font-semibold
+            text-[#4b6800]
+            transition-all
+            duration-200
+            hover:bg-[#4b6800]
+            hover:text-white
+
+            sm:px-8
+            sm:py-2.5
+            sm:text-base
+
+            md:px-10
+            md:py-3
+          "
+        >
+          See All
+        </button>
+      </div>
+
     </section>
   );
 };
