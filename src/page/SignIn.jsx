@@ -5,14 +5,19 @@ import users from "../data/user";
 import SignInNavbar from "../components/SignInNavbar";
 import Footer from "../components/Footer";
 
-const SignIn = () => {
+const SignIn = ({ onLogin }) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // ==========================================
+  // SIGN IN
+  // ==========================================
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,22 +25,51 @@ const SignIn = () => {
     setError("");
     setSuccess("");
 
-    const user = users.find(
+    // Get registered users
+    const savedUsers = localStorage.getItem(
+      "noonHerbUsers"
+    );
+
+    const registeredUsers = savedUsers
+      ? JSON.parse(savedUsers)
+      : [];
+
+    // Combine default users + registered users
+    const allUsers = [
+      ...users,
+      ...registeredUsers,
+    ];
+
+    // Find user
+    const user = allUsers.find(
       (item) =>
-        item.email.toLowerCase() === email.trim().toLowerCase() &&
+        item.email.toLowerCase() ===
+          email.trim().toLowerCase() &&
         item.password === password
     );
+
+    // ==========================================
+    // INVALID LOGIN
+    // ==========================================
 
     if (!user) {
       setError("Invalid email or password.");
       return;
     }
 
+    // ==========================================
+    // LOGGED-IN USER
+    // ==========================================
+
     const loggedInUser = {
       id: user.id,
       name: user.name,
       email: user.email,
     };
+
+    // ==========================================
+    // SAVE LOGIN
+    // ==========================================
 
     if (rememberMe) {
       localStorage.setItem(
@@ -49,20 +83,34 @@ const SignIn = () => {
       );
     }
 
+    // ==========================================
+    // UPDATE APP LOGIN STATE
+    // ==========================================
+
+    if (onLogin) {
+      onLogin();
+    }
+
     setSuccess("Sign in successful!");
+
+    // ==========================================
+    // GO TO HOME
+    // ==========================================
 
     setTimeout(() => {
       navigate("/");
-    }, 700);
+    }, 500);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
 
       {/* ================= NAVBAR ================= */}
+
       <SignInNavbar />
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ================= MAIN ================= */}
+
       <main className="flex-1">
 
         <div
@@ -96,7 +144,8 @@ const SignIn = () => {
             "
           >
 
-            {/* ================= LEFT - TEA IMAGE ================= */}
+            {/* ================= IMAGE ================= */}
+
             <div
               className="
                 hidden
@@ -120,7 +169,8 @@ const SignIn = () => {
               />
             </div>
 
-            {/* ================= RIGHT - SIGN IN FORM ================= */}
+            {/* ================= FORM ================= */}
+
             <div
               className="
                 w-full
@@ -134,7 +184,6 @@ const SignIn = () => {
               "
             >
 
-              {/* Heading */}
               <h1
                 className="
                   text-[#486400]
@@ -147,7 +196,6 @@ const SignIn = () => {
                 Sign in to Noon Herb
               </h1>
 
-              {/* Description */}
               <p
                 className="
                   text-gray-600
@@ -157,19 +205,22 @@ const SignIn = () => {
                   sm:mb-8
                 "
               >
-                Welcome back to Noon Herb! Enter your email to get
-                started.
+                Welcome back to Noon Herb! Enter your email
+                to get started.
               </p>
 
               <form onSubmit={handleSubmit}>
 
-                {/* ================= EMAIL ================= */}
+                {/* EMAIL */}
+
                 <div className="mb-2">
                   <input
                     type="email"
                     placeholder="Enter your Email Address"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
                     required
                     className="
                       w-full
@@ -188,13 +239,16 @@ const SignIn = () => {
                   />
                 </div>
 
-                {/* ================= PASSWORD ================= */}
+                {/* PASSWORD */}
+
                 <div className="mb-3">
                   <input
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) =>
+                      setPassword(e.target.value)
+                    }
                     required
                     className="
                       w-full
@@ -213,7 +267,8 @@ const SignIn = () => {
                   />
                 </div>
 
-                {/* ================= REMEMBER + FORGOT ================= */}
+                {/* REMEMBER ME */}
+
                 <div
                   className="
                     flex
@@ -225,7 +280,15 @@ const SignIn = () => {
                     mb-5
                   "
                 >
-                  <label className="flex items-center gap-2 cursor-pointer">
+
+                  <label
+                    className="
+                      flex
+                      items-center
+                      gap-2
+                      cursor-pointer
+                    "
+                  >
                     <input
                       type="checkbox"
                       checked={rememberMe}
@@ -238,11 +301,10 @@ const SignIn = () => {
                         rounded
                         border-gray-300
                         accent-[#486400]
-                        shrink-0
                       "
                     />
 
-                    <span className="whitespace-nowrap">
+                    <span>
                       Remember me
                     </span>
                   </label>
@@ -254,33 +316,34 @@ const SignIn = () => {
                         "Please contact Noon Herb to reset your password."
                       )
                     }
-                    className="
-                      hover:text-[#486400]
-                      text-right
-                    "
+                    className="hover:text-[#486400]"
                   >
                     Forgot password?{" "}
                     <span className="text-[#486400] font-medium">
                       Reset It
                     </span>
                   </button>
+
                 </div>
 
-                {/* ================= ERROR ================= */}
+                {/* ERROR */}
+
                 {error && (
                   <div className="text-red-600 text-sm mb-3">
                     {error}
                   </div>
                 )}
 
-                {/* ================= SUCCESS ================= */}
+                {/* SUCCESS */}
+
                 {success && (
                   <div className="text-green-700 text-sm mb-3">
                     {success}
                   </div>
                 )}
 
-                {/* ================= SIGN IN BUTTON ================= */}
+                {/* SIGN IN */}
+
                 <button
                   type="submit"
                   className="
@@ -297,11 +360,15 @@ const SignIn = () => {
                 >
                   Sign In
                 </button>
+
               </form>
 
-              {/* ================= SIGN UP ================= */}
+              {/* SIGN UP */}
+
               <p className="text-gray-600 text-xs mt-5">
+
                 Don't have an account?{" "}
+
                 <Link
                   to="/register"
                   className="
@@ -312,14 +379,21 @@ const SignIn = () => {
                 >
                   Sign Up
                 </Link>
+
               </p>
+
             </div>
+
           </div>
+
         </div>
+
       </main>
 
       {/* ================= FOOTER ================= */}
+
       <Footer />
+
     </div>
   );
 };

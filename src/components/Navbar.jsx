@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   Menu,
   X,
+  Package,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +42,6 @@ const Navbar = () => {
         z-50
         transition-all
         duration-300
-
         ${
           scrolled ? "bg-black/40 backdrop-blur-md shadow-lg" : "bg-transparent"
         }
@@ -64,6 +64,7 @@ const Navbar = () => {
             Noon Herb
           </span>
         </button>
+
         {/* Search - Desktop only */}
         <div className="hidden lg:flex h-[55px] flex-1 max-w-[890px] ml-10">
           {/* Search Input */}
@@ -85,7 +86,7 @@ const Navbar = () => {
         </div>
 
         {/* Right Side - Desktop only */}
-        <div className="hidden lg:flex items-center gap-8 ml-14 text-white whitespace-nowrap">
+        <div className="hidden lg:flex items-center gap-7 ml-10 text-white whitespace-nowrap">
           {/* Wishlist */}
           <button className="flex items-center gap-3 text-xl hover:text-lime-500 transition-colors duration-300">
             <Heart className="w-9 h-9" />
@@ -96,12 +97,22 @@ const Navbar = () => {
           <button
             onClick={() => {
               setMenuOpen(false);
-              navigate("/signin");
+              // navigate("/signin");
             }}
             className="flex items-center gap-3 text-lg"
           >
             <User className="w-6 h-6" />
             My Account
+          </button>
+
+         {/* Our Orders  */}
+          <button
+            type="button"
+            onClick={() => navigate("/orders")}
+            className="flex items-center gap-3 text-xl hover:text-lime-500 transition-colors duration-300"
+          >
+            <Package className="w-8 h-8" />
+            <span>Our Orders</span>
           </button>
 
           {/* Cart */}
@@ -139,24 +150,43 @@ const Navbar = () => {
 
           {/* Menu Items */}
           <div className="flex flex-col gap-4 text-gray-700">
+            {/* Wishlist */}
             <button className="flex items-center gap-3 text-lg">
               <Heart className="w-6 h-6" />
               Wish List
             </button>
 
-              <button
-            onClick={() => {
-              setMenuOpen(false);
-              navigate("/signin");
-            }}
-            className="flex items-center gap-3 text-lg"
-          >
-            <User className="w-6 h-6" />
-            My Account
-          </button>
-
+            {/* Account */}
             <button
-              onClick={() => navigate("/cart")}
+              onClick={() => {
+                setMenuOpen(false);
+                // navigate("/signin");
+              }}
+              className="flex items-center gap-3 text-lg"
+            >
+              <User className="w-6 h-6" />
+              My Account
+            </button>
+
+            {/* Our Orders  */}
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/orders");
+              }}
+              className="flex items-center gap-3 text-lg"
+            >
+              <Package className="w-6 h-6" />
+              Our Orders
+            </button>
+
+            {/* Cart */}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/cart");
+              }}
               className="flex items-center gap-3 text-lg"
             >
               <ShoppingCart className="w-6 h-6" />
