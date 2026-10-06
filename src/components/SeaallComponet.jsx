@@ -8,7 +8,7 @@ import recentProducts from "../data/recent";
 
 const PRODUCTS_PER_PAGE = 18;
 
-const SeeAllComponent = ({ onAddToCart = () => {} }) => {
+const SeaallComponet = ({ onAddToCart }) => {
   // ==================================================
   // PRODUCT DATA
   // ==================================================
@@ -100,6 +100,19 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
   };
 
   // ==================================================
+  // ADD TO CART
+  // ==================================================
+
+  const handleAddToCart = (product, quantity = 1) => {
+    if (!onAddToCart) {
+      console.error("onAddToCart was not passed to SeaallComponet.");
+      return;
+    }
+
+    onAddToCart(product, quantity);
+  };
+
+  // ==================================================
   // FILTER CONTENT
   // ==================================================
 
@@ -128,7 +141,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
 
         {categoryOpen && (
           <div className="mt-2 space-y-1">
-            {/* All Categories */}
             <button
               type="button"
               onClick={() => setSelectedCategory("All Categories")}
@@ -145,7 +157,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
               All Categories
             </button>
 
-            {/* Categories */}
             {categories.map((category) => (
               <button
                 key={category}
@@ -231,7 +242,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
       <FilterSection title="Price" open={priceOpen} setOpen={setPriceOpen}>
         <div className="px-1 pt-2">
           <div className="relative h-6">
-            {/* Background line */}
             <div
               className="
                 absolute
@@ -244,7 +254,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
               "
             />
 
-            {/* Selected range */}
             <div
               className="
                 absolute
@@ -257,7 +266,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
               "
             />
 
-            {/* Left handle */}
             <div
               className="
                 absolute
@@ -272,7 +280,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
               "
             />
 
-            {/* Right handle */}
             <div
               className="
                 absolute
@@ -347,7 +354,7 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
       product={product}
       isFavorite={favorites.includes(product.id)}
       onFavorite={handleFavorite}
-      onAddToCart={onAddToCart}
+      onAddToCart={handleAddToCart}
     />
   );
 
@@ -399,36 +406,27 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
 
     return (
       <div className="lg:hidden">
-        {/* First 6 products */}
         <ProductGrid productList={firstProducts} />
 
-        {/* ONE NEEM AD PER PAGE */}
         {firstProducts.length > 0 && (
           <div
             className="
               my-5
               overflow-hidden
               rounded-[14px]
-
               sm:my-6
               sm:rounded-[16px]
-
               md:my-7
             "
           >
             <img
               src="/images/ad/Herb-Neem.png"
               alt="Natural Herbal Extract"
-              className="
-                h-auto
-                w-full
-                object-cover
-              "
+              className="h-auto w-full object-cover"
             />
           </div>
         )}
 
-        {/* Remaining products */}
         <ProductGrid productList={remainingProducts} />
       </div>
     );
@@ -444,17 +442,14 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
 
     return (
       <div className="hidden lg:block">
-        {/* First 9 products */}
         <ProductGrid productList={firstProducts} />
 
-        {/* ONE NEEM AD PER PAGE */}
         {firstProducts.length > 0 && (
           <div
             className="
               my-5
               overflow-hidden
               rounded-[14px]
-
               xl:my-6
               xl:rounded-[16px]
             "
@@ -462,16 +457,11 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
             <img
               src="/images/ad/Herb-Neem.png"
               alt="Natural Herbal Extract"
-              className="
-                h-auto
-                w-full
-                object-cover
-              "
+              className="h-auto w-full object-cover"
             />
           </div>
         )}
 
-        {/* Remaining products */}
         <ProductGrid productList={remainingProducts} />
       </div>
     );
@@ -525,21 +515,14 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
           max-w-[1400px]
           px-4
           py-4
-
           sm:px-6
           sm:py-6
-
           md:px-8
-
           lg:px-10
-
           xl:px-12
         "
       >
-        {/* ==========================================
-            MOBILE FILTER BUTTON
-        ========================================== */}
-
+        {/* MOBILE FILTER */}
         <div className="mb-4 sm:mb-5 lg:hidden">
           <button
             type="button"
@@ -567,7 +550,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
             {showFilters ? <X size={20} /> : <ChevronDown size={20} />}
           </button>
 
-          {/* Mobile Filters */}
           {showFilters && (
             <div
               className="
@@ -584,47 +566,31 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
           )}
         </div>
 
-        {/* ==========================================
-            MAIN LAYOUT
-        ========================================== */}
-
+        {/* MAIN LAYOUT */}
         <div
           className="
             grid
             grid-cols-1
             gap-4
-
             lg:grid-cols-[142px_minmax(0,1fr)]
-
             xl:grid-cols-[160px_minmax(0,1fr)]
             xl:gap-5
           "
         >
-          {/* ========================================
-              LEFT SIDEBAR
-          ======================================== */}
-
+          {/* LEFT SIDEBAR */}
           <aside
             className="
               hidden
-              lg:block
-
-              /*
-                Move the entire left sidebar down so
-                Categories starts at the same level
-                as the first product row.
-              */
               pt-[52px]
+              lg:block
             "
           >
-            {/* Filters */}
             <div
               className="
                 rounded-[14px]
                 bg-[#9abb35]
                 p-3
                 text-white
-
                 xl:p-4
               "
             >
@@ -632,55 +598,27 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
             </div>
 
             {/* Side Ad 1 */}
-            <div
-              className="
-                mt-3
-                overflow-hidden
-                rounded-[14px]
-              "
-            >
+            <div className="mt-3 overflow-hidden rounded-[14px]">
               <img
                 src="/images/ad/Herb-Shampoo.png"
                 alt="Herbal Shampoo"
-                className="
-                  block
-                  h-auto
-                  w-full
-                  object-cover
-                "
+                className="block h-auto w-full object-cover"
               />
             </div>
 
             {/* Side Ad 2 */}
-            <div
-              className="
-                mt-3
-                overflow-hidden
-                rounded-[14px]
-              "
-            >
+            <div className="mt-3 overflow-hidden rounded-[14px]">
               <img
                 src="/images/ad/whey.png"
                 alt="Whey Protein"
-                className="
-                  block
-                  h-auto
-                  w-full
-                  object-cover
-                "
+                className="block h-auto w-full object-cover"
               />
             </div>
           </aside>
 
-          {/* ========================================
-              CENTER CONTENT
-          ======================================== */}
-
+          {/* CENTER CONTENT */}
           <main className="min-w-0">
-            {/* ======================================
-                TOP CONTROLS
-            ====================================== */}
-
+            {/* TOP CONTROLS */}
             <div
               className="
                 mb-4
@@ -688,11 +626,9 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                 items-center
                 justify-between
                 gap-2
-
                 sm:mb-5
               "
             >
-              {/* Product Count */}
               <div
                 className="
                   rounded-md
@@ -702,7 +638,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                   text-xs
                   font-semibold
                   text-white
-
                   sm:px-4
                   sm:text-sm
                 "
@@ -710,7 +645,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                 Show: {products.length}
               </div>
 
-              {/* Sort */}
               <div className="relative">
                 <select
                   value={sortType}
@@ -727,7 +661,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                     font-semibold
                     text-white
                     outline-none
-
                     sm:pl-4
                     sm:pr-9
                     sm:text-sm
@@ -754,30 +687,15 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
               </div>
             </div>
 
-            {/* ======================================
-                MOBILE + TABLET
-            ====================================== */}
-
+            {/* MOBILE + TABLET */}
             <MobileTabletProducts />
 
-            {/* ======================================
-                DESKTOP
-            ====================================== */}
-
+            {/* DESKTOP */}
             <DesktopProducts />
 
-            {/* ======================================
-                PAGINATION
-            ====================================== */}
-
+            {/* PAGINATION */}
             {totalPages > 1 && (
-              <div
-                className="
-                  mt-6
-                  flex
-                  justify-center
-                "
-              >
+              <div className="mt-6 flex justify-center">
                 <div
                   className="
                     flex
@@ -804,10 +722,8 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                       justify-center
                       bg-[#4b6800]
                       text-white
-
                       disabled:cursor-not-allowed
                       disabled:opacity-50
-
                       sm:h-9
                       sm:w-12
                     "
@@ -833,7 +749,6 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                             text-xs
                             font-semibold
                             text-[#4b6800]
-
                             sm:h-9
                             sm:w-10
                             sm:text-sm
@@ -859,11 +774,9 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                           border-[#4b6800]
                           text-xs
                           font-semibold
-
                           sm:h-9
                           sm:w-12
                           sm:text-sm
-
                           ${
                             safeCurrentPage === page
                               ? "bg-[#4b6800] text-white"
@@ -895,10 +808,8 @@ const SeeAllComponent = ({ onAddToCart = () => {} }) => {
                       border-[#4b6800]
                       bg-[#4b6800]
                       text-white
-
                       disabled:cursor-not-allowed
                       disabled:opacity-50
-
                       sm:h-9
                       sm:w-12
                     "
@@ -945,4 +856,4 @@ const FilterSection = ({ title, open, setOpen, children, border = true }) => {
   );
 };
 
-export default SeeAllComponent;
+export default SeaallComponet;

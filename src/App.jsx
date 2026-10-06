@@ -180,7 +180,13 @@ const App = () => {
 
         <Route
           path="/seeall"
-          element={isLoggedIn ? <Seeall /> : <Navigate to="/signin" replace />}
+          element={
+            isLoggedIn ? (
+              <Seeall onAddToCart={handleAddToCart} />
+            ) : (
+              <Navigate to="/signin" replace />
+            )
+          }
         />
 
         {/* ====================================== */}
@@ -197,7 +203,7 @@ const App = () => {
             )
           }
         />
-       {/* ====================================== */}
+        {/* ====================================== */}
         {/* ORDER */}
         {/* ====================================== */}
         <Route
