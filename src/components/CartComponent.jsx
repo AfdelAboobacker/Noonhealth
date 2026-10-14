@@ -17,15 +17,11 @@ const CartComponent = ({
   if (cartItems.length === 0) {
     return (
       <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:px-10 lg:py-10 xl:px-12">
-
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-
-          {/* SIDEBAR */}
-          <Sidebar activeItem="My Cart" />
+       
 
           {/* EMPTY CART */}
           <div className="min-w-0 flex-1">
-
             <h1 className="text-2xl font-semibold text-[#4b6800] sm:text-3xl">
               Shopping Cart
             </h1>
@@ -56,7 +52,6 @@ const CartComponent = ({
                 Continue Shopping
               </button>
             </div>
-
           </div>
         </div>
       </main>
@@ -69,7 +64,7 @@ const CartComponent = ({
 
   const itemSubtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
-    0
+    0,
   );
 
   const serviceFee = 200;
@@ -82,29 +77,16 @@ const CartComponent = ({
 
   return (
     <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:px-10 lg:py-10 xl:px-12">
-
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-
-        {/* ========================================= */}
-        {/* REUSABLE SIDEBAR */}
-        {/* ========================================= */}
-
-        <Sidebar activeItem="My Cart" />
-
-        {/* ========================================= */}
-        {/* RIGHT SIDE CONTENT */}
-        {/* ========================================= */}
+  
 
         <div className="min-w-0 flex-1">
-
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-10">
-
             {/* ========================================= */}
             {/* LEFT - CART ITEMS */}
             {/* ========================================= */}
 
             <div className="min-w-0">
-
               <h1 className="mb-5 text-2xl font-semibold text-[#4b6800] sm:mb-6 sm:text-3xl">
                 Shopping Cart
               </h1>
@@ -112,7 +94,6 @@ const CartComponent = ({
               {/* CART ITEMS */}
 
               <div className="overflow-hidden rounded-xl border border-gray-300">
-
                 {cartItems.map((item, index) => (
                   <div
                     key={item.id}
@@ -134,7 +115,6 @@ const CartComponent = ({
                       }
                     `}
                   >
-
                     {/* ================================= */}
                     {/* PRODUCT IMAGE */}
                     {/* ================================= */}
@@ -169,7 +149,6 @@ const CartComponent = ({
                     {/* ================================= */}
 
                     <div className="flex min-w-0 flex-1 flex-col">
-
                       <h2 className="text-base font-medium leading-6 text-[#4b6800] sm:text-lg sm:leading-7">
                         {item.name}
                       </h2>
@@ -205,7 +184,6 @@ const CartComponent = ({
                           lg:w-[190px]
                         "
                       >
-
                         {/* MINUS */}
                         <button
                           type="button"
@@ -266,7 +244,6 @@ const CartComponent = ({
                             className="sm:size-5 md:size-[22px]"
                           />
                         </button>
-
                       </div>
                     </div>
 
@@ -289,7 +266,6 @@ const CartComponent = ({
                     >
                       ₹ {(item.price * item.quantity).toFixed(2)}
                     </div>
-
                   </div>
                 ))}
               </div>
@@ -299,7 +275,6 @@ const CartComponent = ({
               {/* ========================================= */}
 
               <div className="mt-5 flex justify-center sm:justify-end">
-
                 <button
                   type="button"
                   onClick={() => navigate("/")}
@@ -319,9 +294,7 @@ const CartComponent = ({
                 >
                   Continue Shopping
                 </button>
-
               </div>
-
             </div>
 
             {/* ========================================= */}
@@ -329,53 +302,39 @@ const CartComponent = ({
             {/* ========================================= */}
 
             <div className="w-full">
-
               <h2 className="mb-5 text-2xl font-semibold text-[#4b6800] sm:mb-6 sm:text-3xl">
                 Summary
               </h2>
 
               <div className="rounded-xl border border-gray-300 p-4 shadow-sm sm:p-5 md:p-6">
-
                 {/* ITEM SUBTOTAL */}
 
                 <div className="flex items-center justify-between gap-4 text-base sm:text-lg">
-
-                  <span className="text-[#4b6800]">
-                    Item Subtotal
-                  </span>
+                  <span className="text-[#4b6800]">Item Subtotal</span>
 
                   <span className="shrink-0 font-semibold text-[#4b6800]">
                     ₹ {itemSubtotal.toFixed(2)}
                   </span>
-
                 </div>
 
                 {/* SERVICE FEE */}
 
                 <div className="mt-5 flex items-center justify-between gap-4 text-base sm:mt-7 sm:text-lg">
-
-                  <span className="text-[#4b6800]">
-                    Service Fee
-                  </span>
+                  <span className="text-[#4b6800]">Service Fee</span>
 
                   <span className="shrink-0 font-semibold text-[#4b6800]">
                     ₹ {serviceFee.toFixed(2)}
                   </span>
-
                 </div>
 
                 {/* TOTAL */}
 
                 <div className="mt-5 flex items-center justify-between gap-4 border-t border-gray-200 pt-5 text-base sm:mt-7 sm:pt-6 sm:text-lg">
-
-                  <span className="text-[#4b6800]">
-                    Subtotal
-                  </span>
+                  <span className="text-[#4b6800]">Subtotal</span>
 
                   <span className="shrink-0 font-semibold text-[#4b6800]">
                     ₹ {subtotal.toFixed(2)}
                   </span>
-
                 </div>
 
                 {/* ================================= */}
@@ -471,10 +430,8 @@ const CartComponent = ({
                 <p className="mt-4 text-xs text-[#4b6800] sm:mt-5 sm:text-sm">
                   Terms & Conditions apply
                 </p>
-
               </div>
             </div>
-
           </div>
         </div>
       </div>

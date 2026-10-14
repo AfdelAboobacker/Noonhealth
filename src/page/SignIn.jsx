@@ -26,26 +26,18 @@ const SignIn = ({ onLogin }) => {
     setSuccess("");
 
     // Get registered users
-    const savedUsers = localStorage.getItem(
-      "noonHerbUsers"
-    );
+    const savedUsers = localStorage.getItem("noonHerbUsers");
 
-    const registeredUsers = savedUsers
-      ? JSON.parse(savedUsers)
-      : [];
+    const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
 
     // Combine default users + registered users
-    const allUsers = [
-      ...users,
-      ...registeredUsers,
-    ];
+    const allUsers = [...users, ...registeredUsers];
 
     // Find user
     const user = allUsers.find(
       (item) =>
-        item.email.toLowerCase() ===
-          email.trim().toLowerCase() &&
-        item.password === password
+        item.email.toLowerCase() === email.trim().toLowerCase() &&
+        item.password === password,
     );
 
     // ==========================================
@@ -72,15 +64,9 @@ const SignIn = ({ onLogin }) => {
     // ==========================================
 
     if (rememberMe) {
-      localStorage.setItem(
-        "noonHerbUser",
-        JSON.stringify(loggedInUser)
-      );
+      localStorage.setItem("noonHerbUser", JSON.stringify(loggedInUser));
     } else {
-      sessionStorage.setItem(
-        "noonHerbUser",
-        JSON.stringify(loggedInUser)
-      );
+      sessionStorage.setItem("noonHerbUser", JSON.stringify(loggedInUser));
     }
 
     // ==========================================
@@ -104,7 +90,6 @@ const SignIn = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-
       {/* ================= NAVBAR ================= */}
 
       <SignInNavbar />
@@ -112,7 +97,6 @@ const SignIn = ({ onLogin }) => {
       {/* ================= MAIN ================= */}
 
       <main className="flex-1">
-
         <div
           className="
             w-full
@@ -130,7 +114,6 @@ const SignIn = ({ onLogin }) => {
             xl:py-24
           "
         >
-
           <div
             className="
               grid
@@ -143,7 +126,6 @@ const SignIn = ({ onLogin }) => {
               xl:gap-24
             "
           >
-
             {/* ================= IMAGE ================= */}
 
             <div
@@ -183,7 +165,6 @@ const SignIn = ({ onLogin }) => {
                 md:mx-0
               "
             >
-
               <h1
                 className="
                   text-[#486400]
@@ -205,12 +186,10 @@ const SignIn = ({ onLogin }) => {
                   sm:mb-8
                 "
               >
-                Welcome back to Noon Herb! Enter your email
-                to get started.
+                Welcome back to Noon Herb! Enter your email to get started.
               </p>
 
               <form onSubmit={handleSubmit}>
-
                 {/* EMAIL */}
 
                 <div className="mb-2">
@@ -218,9 +197,7 @@ const SignIn = ({ onLogin }) => {
                     type="email"
                     placeholder="Enter your Email Address"
                     value={email}
-                    onChange={(e) =>
-                      setEmail(e.target.value)
-                    }
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="
                       w-full
@@ -246,9 +223,7 @@ const SignIn = ({ onLogin }) => {
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) =>
-                      setPassword(e.target.value)
-                    }
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                     className="
                       w-full
@@ -280,7 +255,6 @@ const SignIn = ({ onLogin }) => {
                     mb-5
                   "
                 >
-
                   <label
                     className="
                       flex
@@ -292,9 +266,7 @@ const SignIn = ({ onLogin }) => {
                     <input
                       type="checkbox"
                       checked={rememberMe}
-                      onChange={(e) =>
-                        setRememberMe(e.target.checked)
-                      }
+                      onChange={(e) => setRememberMe(e.target.checked)}
                       className="
                         w-5
                         h-5
@@ -304,42 +276,25 @@ const SignIn = ({ onLogin }) => {
                       "
                     />
 
-                    <span>
-                      Remember me
-                    </span>
+                    <span>Remember me</span>
                   </label>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      alert(
-                        "Please contact Noon Herb to reset your password."
-                      )
-                    }
-                    className="hover:text-[#486400]"
-                  >
+                  <Link to="/forgot-password" className="hover:text-[#486400]">
                     Forgot password?{" "}
-                    <span className="text-[#486400] font-medium">
-                      Reset It
-                    </span>
-                  </button>
-
+                    <span className="text-[#486400] font-medium">Reset It</span>
+                  </Link>
                 </div>
 
                 {/* ERROR */}
 
                 {error && (
-                  <div className="text-red-600 text-sm mb-3">
-                    {error}
-                  </div>
+                  <div className="text-red-600 text-sm mb-3">{error}</div>
                 )}
 
                 {/* SUCCESS */}
 
                 {success && (
-                  <div className="text-green-700 text-sm mb-3">
-                    {success}
-                  </div>
+                  <div className="text-green-700 text-sm mb-3">{success}</div>
                 )}
 
                 {/* SIGN IN */}
@@ -360,15 +315,12 @@ const SignIn = ({ onLogin }) => {
                 >
                   Sign In
                 </button>
-
               </form>
 
               {/* SIGN UP */}
 
               <p className="text-gray-600 text-xs mt-5">
-
                 Don't have an account?{" "}
-
                 <Link
                   to="/register"
                   className="
@@ -379,21 +331,15 @@ const SignIn = ({ onLogin }) => {
                 >
                   Sign Up
                 </Link>
-
               </p>
-
             </div>
-
           </div>
-
         </div>
-
       </main>
 
       {/* ================= FOOTER ================= */}
 
       <Footer />
-
     </div>
   );
 };

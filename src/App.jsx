@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 import { Home } from "./page/Home";
 import Cart from "./page/Cart";
@@ -10,12 +15,12 @@ import SignIn from "./page/SignIn";
 import { Register } from "./page/Register";
 import { Checkout } from "./page/Checkout";
 import Order from "./page/Order";
+import ForgotPassword from "./page/ForgotPassword";
+import Setting from "./page/Setting";
+import Address from "./page/Address";
 
 const App = () => {
-  // ==========================================
   // LOGIN STATE
-  // ==========================================
-
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const localUser = localStorage.getItem("noonHerbUser");
     const sessionUser = sessionStorage.getItem("noonHerbUser");
@@ -23,31 +28,34 @@ const App = () => {
     return !!(localUser || sessionUser);
   });
 
-  // ==========================================
   // CART
-  // ==========================================
-
   const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("noonHerbCart");
-
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const savedCart = localStorage.getItem("noonHerbCart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
   });
 
-  // ==========================================
-  // SAVE CART TO LOCAL STORAGE
-  // ==========================================
-
+  // SAVE CART
   useEffect(() => {
     localStorage.setItem("noonHerbCart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // ==========================================
-  // ADD TO CART
-  // ==========================================
+  // LOGOUT
+  const handleLogout = () => {
+    localStorage.removeItem("noonHerbUser");
+    sessionStorage.removeItem("noonHerbUser");
+    setIsLoggedIn(false);
+  };
 
+  // ADD TO CART
   const handleAddToCart = (product, quantity = 1) => {
     setCartItems((prev) => {
-      const existingProduct = prev.find((item) => item.id === product.id);
+      const existingProduct = prev.find(
+        (item) => item.id === product.id
+      );
 
       if (existingProduct) {
         return prev.map((item) =>
@@ -56,94 +64,60 @@ const App = () => {
                 ...item,
                 quantity: item.quantity + quantity,
               }
-            : item,
+            : item
         );
       }
 
-      return [
-        ...prev,
-        {
-          ...product,
-          quantity,
-        },
-      ];
+      return [...prev, { ...product, quantity }];
     });
   };
 
-  // ==========================================
   // INCREASE QUANTITY
-  // ==========================================
-
   const increaseQuantity = (id) => {
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === id
-          ? {
-              ...item,
-              quantity: item.quantity + 1,
-            }
-          : item,
-      ),
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
     );
   };
 
-  // ==========================================
   // DECREASE QUANTITY
-  // ==========================================
-
   const decreaseQuantity = (id) => {
     setCartItems((prev) =>
       prev
         .map((item) =>
           item.id === id
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-              }
-            : item,
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
         )
-        .filter((item) => item.quantity > 0),
+        .filter((item) => item.quantity > 0)
     );
   };
 
-  // ==========================================
   // CLEAR CART
-  // ==========================================
-
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem("noonHerbCart");
   };
 
-  // ==========================================
-  // HOME
-  // ==========================================
-
+  // PROTECTED HOME
   const homePage = isLoggedIn ? (
     <Home onAddToCart={handleAddToCart} />
   ) : (
     <Navigate to="/signin" replace />
   );
 
-  // ==========================================
-  // APP
-  // ==========================================
-
   return (
     <BrowserRouter>
       <ScrollToTop />
 
       <Routes>
-        {/* ====================================== */}
         {/* HOME */}
-        {/* ====================================== */}
-
         <Route path="/" element={homePage} />
 
-        {/* ====================================== */}
         {/* PRODUCT VIEW */}
-        {/* ====================================== */}
-
         <Route
           path="/product/:id"
           element={
@@ -155,10 +129,7 @@ const App = () => {
           }
         />
 
-        {/* ====================================== */}
         {/* CART */}
-        {/* ====================================== */}
-
         <Route
           path="/cart"
           element={
@@ -174,10 +145,7 @@ const App = () => {
           }
         />
 
-        {/* ====================================== */}
         {/* SEE ALL */}
-        {/* ====================================== */}
-
         <Route
           path="/seeall"
           element={
@@ -189,48 +157,82 @@ const App = () => {
           }
         />
 
-        {/* ====================================== */}
         {/* CHECKOUT */}
-        {/* ====================================== */}
-
         <Route
           path="/checkout"
           element={
             isLoggedIn ? (
-              <Checkout cartItems={cartItems} clearCart={clearCart} />
+              <Checkout
+                cartItems={cartItems}
+                clearCart={clearCart}
+              />
             ) : (
               <Navigate to="/signin" replace />
             )
           }
         />
-        {/* ====================================== */}
-        {/* ORDER */}
-        {/* ====================================== */}
+
+        {/* ORDERS */}
         <Route
           path="/orders"
-          element={isLoggedIn ? <Order /> : <Navigate to="/signin" replace />}
+          element={
+            isLoggedIn ? (
+              <Order onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/signin" replace />
+            )
+          }
         />
 
-        {/* ====================================== */}
-        {/* SIGN IN */}
-        {/* ====================================== */}
+        {/* ACCOUNT SETTINGS */}
+        <Route
+          path="/settings"
+          element={
+            isLoggedIn ? (
+              <Setting onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/signin" replace />
+            )
+          }
+        />
 
+        {/* ADDRESS BOOK */}
+        <Route
+          path="/address"
+          element={
+            isLoggedIn ? (
+              <Address onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/signin" replace />
+            )
+          }
+        />
+
+        {/* SIGN IN */}
         <Route
           path="/signin"
-          element={<SignIn onLogin={() => setIsLoggedIn(true)} />}
+          element={
+            <SignIn onLogin={() => setIsLoggedIn(true)} />
+          }
         />
 
-        {/* ====================================== */}
+        {/* FORGOT PASSWORD */}
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
         {/* REGISTER */}
-        {/* ====================================== */}
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-        <Route path="/register" element={<Register />} />
-
-        {/* ====================================== */}
         {/* UNKNOWN URL */}
-        {/* ====================================== */}
-
-        <Route path="*" element={<Navigate to="/signin" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to="/signin" replace />}
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,7 +1,7 @@
   const newArrivals = [
     {
       id: 1,
-      name: "Lorem Ipsum Product 1",
+      name: "Dr.Vidyas acidity relief",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro1.jpg",
@@ -11,7 +11,7 @@
     },
     {
       id: 2,
-      name: "Lorem Ipsum Product 2",
+      name: "Dr.Vidyas inhalant",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro2.jpg",
@@ -21,7 +21,7 @@
     },
     {
       id: 3,
-      name: "Lorem Ipsum Product 3",
+      name: "Dr.Vidyas herbolism",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro3.jpg",
@@ -41,7 +41,7 @@
     },
     {
       id: 5,
-      name: "Lorem Ipsum Product 5",
+      name: "Dr.Vidyas plain",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro5.jpg",
@@ -51,7 +51,7 @@
     },
     {
       id: 6,
-      name: "Lorem Ipsum Product 6",
+      name: "Dr.Vidyas pink",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro6.jpg",
@@ -61,7 +61,7 @@
     },
     {
       id: 7,
-      name: "Lorem Ipsum Product 7",
+      name: "Dr.Vidyas orange",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
       image: "/images/newarrival/pro7.jpg",

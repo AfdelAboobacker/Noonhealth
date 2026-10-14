@@ -1,7 +1,7 @@
 const recentProducts = [
   {
     id: 101,
-    name: "Lorem Ipsum Product 1",
+    name: "Dhawantharam gulika",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro1.jpg",
@@ -12,7 +12,7 @@ const recentProducts = [
 
   {
     id: 102,
-    name: "Lorem Ipsum Product 2",
+    name: "Punarvavadi kashayam",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro2.jpg",
@@ -23,7 +23,7 @@ const recentProducts = [
 
   {
     id: 103,
-    name: "Lorem Ipsum Product 3",
+    name: "Baidyanath hadjod",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro3.jpg",
@@ -34,7 +34,7 @@ const recentProducts = [
 
   {
     id: 104,
-    name: "Lorem Ipsum Product 4",
+    name: "Baidyanath gokshura",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro4.jpg",
@@ -45,7 +45,7 @@ const recentProducts = [
 
   {
     id: 105,
-    name: "Lorem Ipsum Product 5",
+    name: "Kerala ayurveda karpooradi thailam",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro5.jpg",
@@ -56,7 +56,7 @@ const recentProducts = [
 
   {
     id: 106,
-    name: "Lorem Ipsum Product 6",
+    name: "UMA Ayurveda vrisshibadhika vati",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro6.jpg",
@@ -67,7 +67,7 @@ const recentProducts = [
 
   {
     id: 107,
-    name: "Lorem Ipsum Product 7",
+    name: "Haridrakhandam",
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
     image: "/images/recent/pro7.jpg",

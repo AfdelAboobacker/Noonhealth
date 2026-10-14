@@ -1,4 +1,3 @@
-import React from "react";
 import Navbar from "../components/Navbar";
 import SeaallComponet from "../components/SeaallComponet";
 import Footer from "../components/Footer";
@@ -24,3 +23,5 @@ export const Seeall = ({ onAddToCart }) => {
     </div>
   );
 };
+
+export default Seeall;

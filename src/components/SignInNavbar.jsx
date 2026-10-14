@@ -66,28 +66,6 @@ const SignInNavbar = () => {
           Noon Herb
         </span>
       </Link>
-
-      {/* Right Side */}
-      <div
-        className="
-          ml-auto
-          text-white
-          text-xs
-          sm:text-sm
-          md:text-sm
-          lg:text-base
-          xl:text-base
-          text-right
-        "
-      >
-        Already have an account?{" "}
-        <Link
-          to="/signin"
-          className="font-medium hover:underline"
-        >
-          Sign in
-        </Link>
-      </div>
     </header>
   );
 };

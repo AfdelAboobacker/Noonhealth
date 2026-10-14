@@ -1,26 +1,60 @@
-import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
+
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 import ProductCard from "./ProductCard";
-
 import newArrivals from "../data/newarrival";
 import recentProducts from "../data/recent";
 
 const PRODUCTS_PER_PAGE = 18;
 
+const CATEGORIES = [
+  "Vitamins",
+  "Minerals",
+  "Digestive Support",
+  "Bone & Joint",
+  "Sleep",
+  "Children's Health",
+  "Hair, Skin & Nails",
+  "Brain & Cognitive",
+  "Protein",
+];
+
+const getPrice = (product) =>
+  Number(product?.price ?? product?.salePrice ?? product?.sellingPrice ?? 0);
+
+const getCategory = (product) => {
+  const category = product?.category ?? product?.categories ?? "";
+  return Array.isArray(category) ? category : [category];
+};
+
+const getRating = (product) => Number(product?.rating ?? 0);
+
+const getProductName = (product) => String(product?.name ?? "");
+
+const getOptionValues = (products, fields) => {
+  const values = products.flatMap((product) =>
+    fields.flatMap((field) => {
+      const value = product?.[field];
+      return Array.isArray(value) ? value : value ? [value] : [];
+    })
+  );
+
+  return [...new Set(values.map(String))].sort((a, b) =>
+    a.localeCompare(b)
+  );
+};
+
 const SeaallComponet = ({ onAddToCart }) => {
-  // ==================================================
-  // PRODUCT DATA
-  // ==================================================
-
-  const productData = {
-    Recent: recentProducts,
-    NewArrival: newArrivals,
-  };
-
-  // ==================================================
-  // STATES
-  // ==================================================
+  const [searchParams] = useSearchParams();
+  const searchQuery = (searchParams.get("search") || "").trim();
+  const isSearching = searchQuery.length > 0;
 
   const [sortType, setSortType] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,824 +69,594 @@ const SeaallComponet = ({ onAddToCart }) => {
   const [ratingOpen, setRatingOpen] = useState(true);
 
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
+  const [selectedResellers, setSelectedResellers] = useState([]);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [minimumRating, setMinimumRating] = useState(0);
 
-  // ==================================================
-  // CATEGORIES
-  // ==================================================
-
-  const categories = [
-    "Vitamins",
-    "Minerals",
-    "Digestive Support",
-    "Bone & Joint",
-    "Sleep",
-    "Children's Health",
-    "Hair, Skin & Nails",
-    "Brain & Cognitive",
-    "Protein",
-  ];
-
-  // ==================================================
-  // SORT
-  // ==================================================
-
-  const handleSortChange = (e) => {
-    setSortType(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const products = useMemo(() => {
-    if (sortType === "All") {
-      return [...recentProducts, ...newArrivals];
-    }
-
-    return productData[sortType] || [];
-  }, [sortType]);
-
-  // ==================================================
-  // PAGINATION
-  // ==================================================
-
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
-
-  const safeCurrentPage =
-    totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
-
-  const startIndex = (safeCurrentPage - 1) * PRODUCTS_PER_PAGE;
-
-  const currentProducts = products.slice(
-    startIndex,
-    startIndex + PRODUCTS_PER_PAGE,
+  const allProducts = useMemo(
+    () => [...recentProducts, ...newArrivals],
+    []
   );
 
-  // ==================================================
-  // FAVORITES
-  // ==================================================
+  const brands = useMemo(
+    () => getOptionValues(allProducts, ["brand"]),
+    [allProducts]
+  );
 
-  const handleFavorite = (product) => {
-    setFavorites((previousFavorites) => {
-      if (previousFavorites.includes(product.id)) {
-        return previousFavorites.filter((id) => id !== product.id);
-      }
+  const genders = useMemo(
+    () => getOptionValues(allProducts, ["gender"]),
+    [allProducts]
+  );
 
-      return [...previousFavorites, product.id];
-    });
-  };
+  const resellers = useMemo(
+    () => getOptionValues(allProducts, ["reseller", "seller"]),
+    [allProducts]
+  );
 
-  // ==================================================
-  // ADD TO CART
-  // ==================================================
+  const products = useMemo(() => {
+    let result =
+      sortType === "Recent"
+        ? [...recentProducts]
+        : sortType === "NewArrival"
+          ? [...newArrivals]
+          : [...recentProducts, ...newArrivals];
 
-  const handleAddToCart = (product, quantity = 1) => {
-    if (!onAddToCart) {
-      console.error("onAddToCart was not passed to SeaallComponet.");
-      return;
+    // Search matches product names only.
+    if (isSearching) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((product) =>
+        getProductName(product).toLowerCase().includes(query)
+      );
     }
 
-    onAddToCart(product, quantity);
+    if (selectedCategory !== "All Categories") {
+      result = result.filter((product) =>
+        getCategory(product).some(
+          (category) =>
+            String(category).toLowerCase() ===
+            selectedCategory.toLowerCase()
+        )
+      );
+    }
+
+    if (selectedBrands.length > 0) {
+      result = result.filter((product) =>
+        selectedBrands.includes(String(product.brand ?? ""))
+      );
+    }
+
+    if (selectedGenders.length > 0) {
+      result = result.filter((product) =>
+        selectedGenders.includes(String(product.gender ?? ""))
+      );
+    }
+
+    if (selectedResellers.length > 0) {
+      result = result.filter((product) =>
+        selectedResellers.includes(
+          String(product.reseller ?? product.seller ?? "")
+        )
+      );
+    }
+
+    if (minPrice !== "") {
+      result = result.filter(
+        (product) => getPrice(product) >= Number(minPrice)
+      );
+    }
+
+    if (maxPrice !== "") {
+      result = result.filter(
+        (product) => getPrice(product) <= Number(maxPrice)
+      );
+    }
+
+    if (minimumRating > 0) {
+      result = result.filter(
+        (product) => getRating(product) >= minimumRating
+      );
+    }
+
+    return result;
+  }, [
+    sortType,
+    isSearching,
+    searchQuery,
+    selectedCategory,
+    selectedBrands,
+    selectedGenders,
+    selectedResellers,
+    minPrice,
+    maxPrice,
+    minimumRating,
+  ]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    sortType,
+    selectedCategory,
+    selectedBrands,
+    selectedGenders,
+    selectedResellers,
+    minPrice,
+    maxPrice,
+    minimumRating,
+  ]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(products.length / PRODUCTS_PER_PAGE)
+  );
+
+  const paginatedProducts = products.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
+  const toggleSelection = (value, selected, setSelected) => {
+    setSelected((previous) =>
+      previous.includes(value)
+        ? previous.filter((item) => item !== value)
+        : [...previous, value]
+    );
   };
 
-  // ==================================================
-  // FILTER CONTENT
-  // ==================================================
+  const toggleFavorite = (product) => {
+    const productId = product.id ?? product._id ?? product.name;
 
-  const FilterContent = () => (
-    <div className="w-full">
-      {/* Categories */}
-      <div className="border-b border-white/70 pb-2">
+    setFavorites((previous) =>
+      previous.includes(productId)
+        ? previous.filter((id) => id !== productId)
+        : [...previous, productId]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategory("All Categories");
+    setSelectedBrands([]);
+    setSelectedGenders([]);
+    setSelectedResellers([]);
+    setMinPrice("");
+    setMaxPrice("");
+    setMinimumRating(0);
+  };
+
+  const SectionHeader = ({ title, open, setOpen }) => (
+    <button
+      type="button"
+      onClick={() => setOpen(!open)}
+      className="flex w-full items-center justify-between py-3 text-left text-sm font-semibold text-gray-800"
+    >
+      {title}
+      {open ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+    </button>
+  );
+
+  const CheckOption = ({ label, checked, onChange }) => (
+    <label className="flex cursor-pointer items-center gap-2 py-1.5 text-sm text-gray-600">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="h-4 w-4 accent-green-700"
+      />
+      <span>{label}</span>
+    </label>
+  );
+
+  const FilterSidebar = ({ mobile = false }) => (
+    <aside
+      className={`rounded-xl bg-white ${
+        mobile ? "w-full" : "sticky top-24"
+      }`}
+    >
+      <div className="flex items-center justify-between border-b pb-3">
+        <h2 className="font-semibold text-gray-900">Filters</h2>
         <button
           type="button"
-          onClick={() => setCategoryOpen(!categoryOpen)}
-          className="
-            flex
-            w-full
-            items-center
-            justify-between
-            text-left
-            text-sm
-            font-semibold
-            text-white
-          "
+          onClick={clearFilters}
+          className="text-sm text-green-700 hover:underline"
         >
-          <span>Categories</span>
-
-          {categoryOpen ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+          Clear all
         </button>
+      </div>
 
+      <div className="border-b">
+        <SectionHeader
+          title="Categories"
+          open={categoryOpen}
+          setOpen={setCategoryOpen}
+        />
         {categoryOpen && (
-          <div className="mt-2 space-y-1">
-            <button
-              type="button"
-              onClick={() => setSelectedCategory("All Categories")}
-              className={`
-                block
-                w-full
-                text-left
-                text-sm
-                transition
-                hover:font-semibold
-                ${selectedCategory === "All Categories" ? "font-semibold" : ""}
-              `}
-            >
-              All Categories
-            </button>
-
-            {categories.map((category) => (
-              <button
+          <div className="pb-3">
+            <CheckOption
+              label="All Categories"
+              checked={selectedCategory === "All Categories"}
+              onChange={() => setSelectedCategory("All Categories")}
+            />
+            {CATEGORIES.map((category) => (
+              <CheckOption
                 key={category}
-                type="button"
-                onClick={() => setSelectedCategory(category)}
-                className={`
-                  block
-                  w-full
-                  text-left
-                  text-sm
-                  transition
-                  hover:font-semibold
-                  ${selectedCategory === category ? "font-semibold" : ""}
-                `}
-              >
-                {category}
-              </button>
+                label={category}
+                checked={selectedCategory === category}
+                onChange={() =>
+                  setSelectedCategory(
+                    selectedCategory === category
+                      ? "All Categories"
+                      : category
+                  )
+                }
+              />
             ))}
           </div>
         )}
       </div>
 
-      {/* Brand */}
-      <FilterSection title="Brand" open={brandOpen} setOpen={setBrandOpen}>
-        <div className="space-y-2 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Himalaya
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Dabur
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Patanjali
-          </label>
-        </div>
-      </FilterSection>
-
-      {/* Gender */}
-      <FilterSection title="Gender" open={genderOpen} setOpen={setGenderOpen}>
-        <div className="space-y-2 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Men
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Women
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Unisex
-          </label>
-        </div>
-      </FilterSection>
-
-      {/* Reseller */}
-      <FilterSection
-        title="Reseller"
-        open={resellerOpen}
-        setOpen={setResellerOpen}
-      >
-        <div className="space-y-2 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Official Store
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
-            Verified Seller
-          </label>
-        </div>
-      </FilterSection>
-
-      {/* Price */}
-      <FilterSection title="Price" open={priceOpen} setOpen={setPriceOpen}>
-        <div className="px-1 pt-2">
-          <div className="relative h-6">
-            <div
-              className="
-                absolute
-                left-0
-                right-0
-                top-2
-                h-1
-                rounded-full
-                bg-white
-              "
-            />
-
-            <div
-              className="
-                absolute
-                left-[20%]
-                right-[15%]
-                top-2
-                h-1
-                rounded-full
-                bg-[#486400]
-              "
-            />
-
-            <div
-              className="
-                absolute
-                left-[20%]
-                top-0
-                h-5
-                w-5
-                rounded-full
-                border-2
-                border-[#486400]
-                bg-white
-              "
-            />
-
-            <div
-              className="
-                absolute
-                right-[15%]
-                top-0
-                h-5
-                w-5
-                rounded-full
-                border-2
-                border-[#486400]
-                bg-white
-              "
-            />
-          </div>
-
-          <div
-            className="
-              flex
-              justify-between
-              text-[10px]
-              font-semibold
-            "
-          >
-            <span>200</span>
-            <span>1500</span>
-          </div>
-        </div>
-      </FilterSection>
-
-      {/* Rating */}
-      <FilterSection
-        title="Rating"
-        open={ratingOpen}
-        setOpen={setRatingOpen}
-        border={false}
-      >
-        <div className="space-y-1 text-lg leading-none">
-          <div className="flex gap-1">
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-          </div>
-
-          <div className="flex gap-1">
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>☆</span>
-          </div>
-
-          <div className="flex gap-1">
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>☆</span>
-            <span>☆</span>
-          </div>
-        </div>
-      </FilterSection>
-    </div>
-  );
-
-  // ==================================================
-  // PRODUCT ITEM
-  // ==================================================
-
-  const ProductItem = ({ product }) => (
-    <ProductCard
-      product={product}
-      isFavorite={favorites.includes(product.id)}
-      onFavorite={handleFavorite}
-      onAddToCart={handleAddToCart}
-    />
-  );
-
-  // ==================================================
-  // PRODUCT GRID
-  // ==================================================
-
-  const ProductGrid = ({ productList }) => {
-    if (!productList.length) {
-      return null;
-    }
-
-    return (
-      <div
-        className="
-          grid
-          grid-cols-2
-          gap-2
-
-          sm:grid-cols-2
-          sm:gap-3
-
-          md:grid-cols-3
-          md:gap-4
-
-          lg:grid-cols-3
-          lg:gap-3
-
-          xl:grid-cols-3
-          xl:gap-4
-        "
-      >
-        {productList.map((product) => (
-          <div key={product.id}>
-            <ProductItem product={product} />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  // ==================================================
-  // MOBILE + TABLET PRODUCTS
-  // ==================================================
-
-  const MobileTabletProducts = () => {
-    const firstProducts = currentProducts.slice(0, 6);
-    const remainingProducts = currentProducts.slice(6);
-
-    return (
-      <div className="lg:hidden">
-        <ProductGrid productList={firstProducts} />
-
-        {firstProducts.length > 0 && (
-          <div
-            className="
-              my-5
-              overflow-hidden
-              rounded-[14px]
-              sm:my-6
-              sm:rounded-[16px]
-              md:my-7
-            "
-          >
-            <img
-              src="/images/ad/Herb-Neem.png"
-              alt="Natural Herbal Extract"
-              className="h-auto w-full object-cover"
-            />
-          </div>
-        )}
-
-        <ProductGrid productList={remainingProducts} />
-      </div>
-    );
-  };
-
-  // ==================================================
-  // DESKTOP PRODUCTS
-  // ==================================================
-
-  const DesktopProducts = () => {
-    const firstProducts = currentProducts.slice(0, 9);
-    const remainingProducts = currentProducts.slice(9);
-
-    return (
-      <div className="hidden lg:block">
-        <ProductGrid productList={firstProducts} />
-
-        {firstProducts.length > 0 && (
-          <div
-            className="
-              my-5
-              overflow-hidden
-              rounded-[14px]
-              xl:my-6
-              xl:rounded-[16px]
-            "
-          >
-            <img
-              src="/images/ad/Herb-Neem.png"
-              alt="Natural Herbal Extract"
-              className="h-auto w-full object-cover"
-            />
-          </div>
-        )}
-
-        <ProductGrid productList={remainingProducts} />
-      </div>
-    );
-  };
-
-  // ==================================================
-  // PAGINATION
-  // ==================================================
-
-  const getPageNumbers = () => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
-    }
-
-    if (safeCurrentPage <= 3) {
-      return [1, 2, 3, 4, "...", totalPages];
-    }
-
-    if (safeCurrentPage >= totalPages - 2) {
-      return [
-        1,
-        "...",
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ];
-    }
-
-    return [
-      1,
-      "...",
-      safeCurrentPage - 1,
-      safeCurrentPage,
-      safeCurrentPage + 1,
-      "...",
-      totalPages,
-    ];
-  };
-
-  // ==================================================
-  // MAIN
-  // ==================================================
-
-  return (
-    <section className="w-full bg-white">
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-[1400px]
-          px-4
-          py-4
-          sm:px-6
-          sm:py-6
-          md:px-8
-          lg:px-10
-          xl:px-12
-        "
-      >
-        {/* MOBILE FILTER */}
-        <div className="mb-4 sm:mb-5 lg:hidden">
-          <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className="
-              flex
-              w-full
-              items-center
-              justify-between
-              rounded-xl
-              bg-[#9abb35]
-              px-4
-              py-3
-              text-sm
-              font-semibold
-              text-white
-              shadow-sm
-            "
-          >
-            <span className="flex items-center gap-2">
-              <SlidersHorizontal size={18} />
-              Customize Selection
-            </span>
-
-            {showFilters ? <X size={20} /> : <ChevronDown size={20} />}
-          </button>
-
-          {showFilters && (
-            <div
-              className="
-                mt-2
-                rounded-xl
-                bg-[#9abb35]
-                p-4
-                text-white
-                shadow-md
-              "
-            >
-              <FilterContent />
+      {brands.length > 0 && (
+        <div className="border-b">
+          <SectionHeader
+            title="Brand"
+            open={brandOpen}
+            setOpen={setBrandOpen}
+          />
+          {brandOpen && (
+            <div className="max-h-48 overflow-y-auto pb-3">
+              {brands.map((brand) => (
+                <CheckOption
+                  key={brand}
+                  label={brand}
+                  checked={selectedBrands.includes(brand)}
+                  onChange={() =>
+                    toggleSelection(
+                      brand,
+                      selectedBrands,
+                      setSelectedBrands
+                    )
+                  }
+                />
+              ))}
             </div>
           )}
         </div>
+      )}
 
-        {/* MAIN LAYOUT */}
-        <div
-          className="
-            grid
-            grid-cols-1
-            gap-4
-            lg:grid-cols-[142px_minmax(0,1fr)]
-            xl:grid-cols-[160px_minmax(0,1fr)]
-            xl:gap-5
-          "
-        >
-          {/* LEFT SIDEBAR */}
-          <aside
-            className="
-              hidden
-              pt-[52px]
-              lg:block
-            "
-          >
-            <div
-              className="
-                rounded-[14px]
-                bg-[#9abb35]
-                p-3
-                text-white
-                xl:p-4
-              "
-            >
-              <FilterContent />
-            </div>
-
-            {/* Side Ad 1 */}
-            <div className="mt-3 overflow-hidden rounded-[14px]">
-              <img
-                src="/images/ad/Herb-Shampoo.png"
-                alt="Herbal Shampoo"
-                className="block h-auto w-full object-cover"
-              />
-            </div>
-
-            {/* Side Ad 2 */}
-            <div className="mt-3 overflow-hidden rounded-[14px]">
-              <img
-                src="/images/ad/whey.png"
-                alt="Whey Protein"
-                className="block h-auto w-full object-cover"
-              />
-            </div>
-          </aside>
-
-          {/* CENTER CONTENT */}
-          <main className="min-w-0">
-            {/* TOP CONTROLS */}
-            <div
-              className="
-                mb-4
-                flex
-                items-center
-                justify-between
-                gap-2
-                sm:mb-5
-              "
-            >
-              <div
-                className="
-                  rounded-md
-                  bg-[#9abb35]
-                  px-3
-                  py-2
-                  text-xs
-                  font-semibold
-                  text-white
-                  sm:px-4
-                  sm:text-sm
-                "
-              >
-                Show: {products.length}
-              </div>
-
-              <div className="relative">
-                <select
-                  value={sortType}
-                  onChange={handleSortChange}
-                  className="
-                    cursor-pointer
-                    appearance-none
-                    rounded-md
-                    bg-[#9abb35]
-                    py-2
-                    pl-3
-                    pr-8
-                    text-xs
-                    font-semibold
-                    text-white
-                    outline-none
-                    sm:pl-4
-                    sm:pr-9
-                    sm:text-sm
-                  "
-                >
-                  <option value="All">Sort by: All</option>
-
-                  <option value="Recent">Sort by: Recent</option>
-
-                  <option value="NewArrival">Sort by: New Arrival</option>
-                </select>
-
-                <ChevronDown
-                  size={16}
-                  className="
-                    pointer-events-none
-                    absolute
-                    right-2
-                    top-1/2
-                    -translate-y-1/2
-                    text-white
-                  "
+      {genders.length > 0 && (
+        <div className="border-b">
+          <SectionHeader
+            title="Gender"
+            open={genderOpen}
+            setOpen={setGenderOpen}
+          />
+          {genderOpen && (
+            <div className="pb-3">
+              {genders.map((gender) => (
+                <CheckOption
+                  key={gender}
+                  label={gender}
+                  checked={selectedGenders.includes(gender)}
+                  onChange={() =>
+                    toggleSelection(
+                      gender,
+                      selectedGenders,
+                      setSelectedGenders
+                    )
+                  }
                 />
-              </div>
+              ))}
             </div>
+          )}
+        </div>
+      )}
 
-            {/* MOBILE + TABLET */}
-            <MobileTabletProducts />
+      {resellers.length > 0 && (
+        <div className="border-b">
+          <SectionHeader
+            title="Reseller"
+            open={resellerOpen}
+            setOpen={setResellerOpen}
+          />
+          {resellerOpen && (
+            <div className="pb-3">
+              {resellers.map((reseller) => (
+                <CheckOption
+                  key={reseller}
+                  label={reseller}
+                  checked={selectedResellers.includes(reseller)}
+                  onChange={() =>
+                    toggleSelection(
+                      reseller,
+                      selectedResellers,
+                      setSelectedResellers
+                    )
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-            {/* DESKTOP */}
-            <DesktopProducts />
+      <div className="border-b">
+        <SectionHeader
+          title="Price"
+          open={priceOpen}
+          setOpen={setPriceOpen}
+        />
+        {priceOpen && (
+          <div className="grid grid-cols-2 gap-2 pb-4">
+            <input
+              type="number"
+              min="0"
+              value={minPrice}
+              onChange={(event) => setMinPrice(event.target.value)}
+              placeholder="Min ₹"
+              className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-green-700"
+            />
+            <input
+              type="number"
+              min="0"
+              value={maxPrice}
+              onChange={(event) => setMaxPrice(event.target.value)}
+              placeholder="Max ₹"
+              className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-green-700"
+            />
+          </div>
+        )}
+      </div>
 
-            {/* PAGINATION */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <div
-                  className="
-                    flex
-                    overflow-hidden
-                    rounded-md
-                    border
-                    border-[#4b6800]
-                  "
-                >
-                  {/* PREVIOUS */}
+      <div>
+        <SectionHeader
+          title="Rating"
+          open={ratingOpen}
+          setOpen={setRatingOpen}
+        />
+        {ratingOpen && (
+          <div className="pb-4">
+            {[4, 3, 2, 1].map((rating) => (
+              <CheckOption
+                key={rating}
+                label={`${rating}★ & above`}
+                checked={minimumRating === rating}
+                onChange={() =>
+                  setMinimumRating(
+                    minimumRating === rating ? 0 : rating
+                  )
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar advertisements are hidden during searches. */}
+      {!isSearching && (
+        <div className="mt-4 space-y-3">
+          <div className="overflow-hidden rounded-[14px]">
+            <img
+              src="/images/ad/Herb-Shampoo.png"
+              alt="Herbal Shampoo"
+              className="block h-auto w-full object-cover"
+            />
+          </div>
+          <div className="overflow-hidden rounded-[14px]">
+            <img
+              src="/images/ad/whey.png"
+              alt="Whey Protein"
+              className="block h-auto w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+    </aside>
+  );
+
+  const renderProductCard = (product) => {
+    const productId = product.id ?? product._id ?? product.name;
+
+    return (
+      <ProductCard
+        key={productId}
+        product={product}
+        isFavorite={favorites.includes(productId)}
+        onFavorite={() => toggleFavorite(product)}
+        onAddToCart={(item, quantity) =>
+          onAddToCart?.(item ?? product, quantity ?? 1)
+        }
+      />
+    );
+  };
+
+  const MobileTabletProducts = () => {
+    const firstProducts = paginatedProducts.slice(0, 6);
+    const remainingProducts = paginatedProducts.slice(6);
+
+    return (
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:hidden">
+        {firstProducts.map(renderProductCard)}
+
+        {/* Neem advertisement is hidden during searches. */}
+        {!isSearching && firstProducts.length > 0 && (
+          <div className="col-span-2 my-2 overflow-hidden rounded-[14px] sm:col-span-3 sm:my-3 sm:rounded-[16px]">
+            <img
+              src="/images/ad/Herb-Neem.png"
+              alt="Natural Herbal Extract"
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        )}
+
+        {remainingProducts.map(renderProductCard)}
+      </div>
+    );
+  };
+
+  const DesktopProducts = () => {
+    const firstProducts = paginatedProducts.slice(0, 9);
+    const remainingProducts = paginatedProducts.slice(9);
+
+    return (
+      <div className="hidden grid-cols-3 gap-4 lg:grid xl:grid-cols-4 xl:gap-5">
+        {firstProducts.map(renderProductCard)}
+
+        {/* Neem advertisement is hidden during searches. */}
+        {!isSearching && firstProducts.length > 0 && (
+          <div className="col-span-3 my-2 overflow-hidden rounded-[14px] xl:col-span-4 xl:my-3 xl:rounded-[16px]">
+            <img
+              src="/images/ad/Herb-Neem.png"
+              alt="Natural Herbal Extract"
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        )}
+
+        {remainingProducts.map(renderProductCard)}
+      </div>
+    );
+  };
+
+  return (
+    <section className="mx-auto w-full max-w-[1600px] px-3 pb-12 sm:px-5 lg:px-8">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+            {isSearching ? "Search Results" : "All Products"}
+          </h1>
+          {isSearching && (
+            <p className="mt-1 text-sm text-gray-500">
+              Results for "{searchQuery}"
+            </p>
+          )}
+          <p className="mt-1 text-sm text-gray-500">
+            {products.length} product{products.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm lg:hidden"
+          >
+            <SlidersHorizontal size={16} />
+            Customize Selection
+          </button>
+
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="hidden sm:inline">Sort by</span>
+            <select
+              value={sortType}
+              onChange={(event) => setSortType(event.target.value)}
+              className="max-w-[145px] rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-green-700"
+            >
+              <option value="All">All Products</option>
+              <option value="Recent">Recent</option>
+              <option value="NewArrival">New Arrivals</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {showFilters && (
+        <div className="mb-5 rounded-xl border p-4 lg:hidden">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-semibold">Customize Selection</span>
+            <button
+              type="button"
+              onClick={() => setShowFilters(false)}
+              aria-label="Close filters"
+              className="rounded-full p-1 hover:bg-gray-100"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <FilterSidebar mobile />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[250px_minmax(0,1fr)]">
+        <div className="hidden lg:block">
+          <FilterSidebar />
+        </div>
+
+        <div className="min-w-0">
+          {products.length === 0 ? (
+            <div className="rounded-xl border border-dashed py-16 text-center">
+              <h2 className="text-lg font-semibold text-gray-800">
+                No products found
+              </h2>
+              <p className="mt-2 text-sm text-gray-500">
+                {isSearching
+                  ? "Try searching with another product name."
+                  : "Try changing your filters."}
+              </p>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-4 rounded-lg bg-green-800 px-5 py-2 text-sm font-medium text-white hover:bg-green-900"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <>
+              <MobileTabletProducts />
+              <DesktopProducts />
+
+              {totalPages > 1 && (
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
                   <button
                     type="button"
-                    disabled={safeCurrentPage === 1}
+                    disabled={currentPage === 1}
                     onClick={() =>
-                      setCurrentPage((previousPage) =>
-                        Math.max(previousPage - 1, 1),
-                      )
+                      setCurrentPage((page) => Math.max(1, page - 1))
                     }
-                    className="
-                      flex
-                      h-8
-                      w-10
-                      items-center
-                      justify-center
-                      bg-[#4b6800]
-                      text-white
-                      disabled:cursor-not-allowed
-                      disabled:opacity-50
-                      sm:h-9
-                      sm:w-12
-                    "
+                    className="rounded-lg border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    ‹
+                    Previous
                   </button>
 
-                  {/* PAGE NUMBERS */}
-                  {getPageNumbers().map((page, index) => {
-                    if (page === "...") {
-                      return (
-                        <span
-                          key={`ellipsis-${index}`}
-                          className="
-                            flex
-                            h-8
-                            w-8
-                            items-center
-                            justify-center
-                            border-l
-                            border-[#4b6800]
-                            bg-white
-                            text-xs
-                            font-semibold
-                            text-[#4b6800]
-                            sm:h-9
-                            sm:w-10
-                            sm:text-sm
-                          "
-                        >
-                          ...
-                        </span>
-                      );
-                    }
+                  {Array.from(
+                    { length: totalPages },
+                    (_, index) => index + 1
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setCurrentPage(page)}
+                      className={`h-9 min-w-9 rounded-lg border px-3 text-sm ${
+                        currentPage === page
+                          ? "border-green-800 bg-green-800 text-white"
+                          : "hover:bg-gray-100"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
 
-                    return (
-                      <button
-                        key={page}
-                        type="button"
-                        onClick={() => setCurrentPage(page)}
-                        className={`
-                          flex
-                          h-8
-                          w-10
-                          items-center
-                          justify-center
-                          border-l
-                          border-[#4b6800]
-                          text-xs
-                          font-semibold
-                          sm:h-9
-                          sm:w-12
-                          sm:text-sm
-                          ${
-                            safeCurrentPage === page
-                              ? "bg-[#4b6800] text-white"
-                              : "bg-white text-[#4b6800] hover:bg-[#eef4d8]"
-                          }
-                        `}
-                      >
-                        {page}
-                      </button>
-                    );
-                  })}
-
-                  {/* NEXT */}
                   <button
                     type="button"
-                    disabled={safeCurrentPage === totalPages}
+                    disabled={currentPage === totalPages}
                     onClick={() =>
-                      setCurrentPage((previousPage) =>
-                        Math.min(previousPage + 1, totalPages),
+                      setCurrentPage((page) =>
+                        Math.min(totalPages, page + 1)
                       )
                     }
-                    className="
-                      flex
-                      h-8
-                      w-10
-                      items-center
-                      justify-center
-                      border-l
-                      border-[#4b6800]
-                      bg-[#4b6800]
-                      text-white
-                      disabled:cursor-not-allowed
-                      disabled:opacity-50
-                      sm:h-9
-                      sm:w-12
-                    "
+                    className="rounded-lg border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    ›
+                    Next
                   </button>
                 </div>
-              </div>
-            )}
-          </main>
+              )}
+            </>
+          )}
         </div>
       </div>
     </section>
-  );
-};
-
-// ======================================================
-// REUSABLE FILTER SECTION
-// ======================================================
-
-const FilterSection = ({ title, open, setOpen, children, border = true }) => {
-  return (
-    <div className={`py-2 ${border ? "border-b border-white/70" : ""}`}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="
-          flex
-          w-full
-          items-center
-          justify-between
-          text-sm
-          font-semibold
-          text-white
-        "
-      >
-        <span>{title}</span>
-
-        {open ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
-      </button>
-
-      {open && <div className="mt-2">{children}</div>}
-    </div>
   );
 };
 

@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Sidebar = ({ activeItem = "Your Orders" }) => {
+const Sidebar = ({ activeItem = "Your Orders", onLogout }) => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const menuItems = [
     "Your Orders",
-    "My Cart",
     "Settings",
     "Address",
     "Payment Method",
@@ -19,88 +18,84 @@ const Sidebar = ({ activeItem = "Your Orders" }) => {
   const handleMenuClick = (item) => {
     setMenuOpen(false);
 
-    if (item === "Your Orders") {
-      navigate("/orders");
-    }
+    switch (item) {
+      case "Your Orders":
+        navigate("/orders");
+        break;
 
-    if (item === "My Cart") {
-      navigate("/cart");
-    }
+      case "Settings":
+        navigate("/settings");
+        break;
 
-    // Add other navigation later
+      case "Address":
+        navigate("/address");
+        break;
+
+      case "Payment Method":
+        navigate("/payment-method");
+        break;
+
+      case "Notification":
+        navigate("/notification");
+        break;
+
+      case "Logout":
+        localStorage.removeItem("noonHerbUser");
+        sessionStorage.removeItem("noonHerbUser");
+
+        if (onLogout) {
+          onLogout();
+        } else {
+          navigate("/signin");
+        }
+        break;
+
+      default:
+        break;
+    }
   };
+
+  const getButtonClass = (item) => `
+    w-full min-h-[50px] px-3 rounded-[9px]
+    text-[18px] sm:text-[20px] font-semibold
+    transition-colors
+    ${
+      item === activeItem
+        ? "bg-[#96B532] text-white"
+        : "bg-[#96B532] text-white hover:bg-[#86A526]"
+    }
+  `;
 
   return (
     <>
-      {/* ========================================= */}
-      {/* SMALL + MEDIUM */}
-      {/* ========================================= */}
-
-      <div className="lg:hidden w-full">
+      {/* Mobile and tablet sidebar dropdown */}
+      <div className="relative w-full lg:hidden">
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className="
-            w-full
-            h-[52px]
-            px-5
-            rounded-[9px]
-            bg-[#96B532]
-            text-white
-            text-[18px]
-            sm:text-[20px]
-            font-semibold
-            flex
-            items-center
-            justify-between
-            transition
-            hover:bg-[#86A526]
-          "
+          aria-expanded={menuOpen}
+          className="flex min-h-[52px] w-full items-center justify-between rounded-[9px] bg-[#96B532] px-5 text-[18px] font-semibold text-white sm:text-[20px]"
         >
           <span>{activeItem}</span>
-
           {menuOpen ? (
-            <ChevronUp className="w-6 h-6" />
+            <ChevronUp className="h-6 w-6" />
           ) : (
-            <ChevronDown className="w-6 h-6" />
+            <ChevronDown className="h-6 w-6" />
           )}
         </button>
 
         {menuOpen && (
-          <div
-            className="
-              mt-2
-              w-full
-              bg-white
-              rounded-[9px]
-              shadow-md
-              border
-              border-gray-100
-              overflow-hidden
-              relative
-              z-30
-            "
-          >
+          <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-[9px] border border-gray-100 bg-white shadow-md">
             {menuItems.map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => handleMenuClick(item)}
-                className={`
-                  w-full
-                  min-h-[48px]
-                  px-5
-                  text-left
-                  text-[17px]
-                  sm:text-[18px]
-                  font-medium
-                  transition
-                  ${
-                    item === activeItem
-                      ? "bg-[#96B532] text-white"
-                      : "text-[#456600] hover:bg-[#f1f5df]"
-                  }
-                `}
+                className={`w-full min-h-[48px] px-5 text-left text-[17px] font-medium transition-colors sm:text-[18px] ${
+                  item === activeItem
+                    ? "bg-[#96B532] text-white"
+                    : "text-[#456600] hover:bg-[#f1f5df]"
+                }`}
               >
                 {item}
               </button>
@@ -109,30 +104,15 @@ const Sidebar = ({ activeItem = "Your Orders" }) => {
         )}
       </div>
 
-      {/* ========================================= */}
-      {/* LARGE SCREEN */}
-      {/* ========================================= */}
-
-      <aside className="hidden lg:block w-[255px] shrink-0">
+      {/* Desktop sidebar */}
+      <aside className="hidden w-full shrink-0 lg:block lg:w-[255px]">
         <div className="flex flex-col gap-[17px]">
           {menuItems.map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => handleMenuClick(item)}
-              className={`
-                w-full
-                h-[50px]
-                rounded-[9px]
-                text-[20px]
-                font-semibold
-                transition
-                ${
-                  item === activeItem
-                    ? "bg-[#96B532] text-white"
-                    : "bg-[#96B532] text-white hover:bg-[#86A526]"
-                }
-              `}
+              className={getButtonClass(item)}
             >
               {item}
             </button>
