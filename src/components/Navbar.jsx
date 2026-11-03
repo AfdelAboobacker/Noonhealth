@@ -11,9 +11,7 @@ import {
 
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
-import newArrivals from "../data/newarrival";
-import recentProducts from "../data/recent";
+import { getProducts } from "../api/productApi";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -25,8 +23,20 @@ const Navbar = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // All products used by the See All page
-  const allProducts = useMemo(() => [...recentProducts, ...newArrivals], []);
+  const [allProducts, setAllProducts] = useState([]);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Error fetching navbar products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   // Sync search when the URL changes
   useEffect(() => {
     setSearch(searchParams.get("search") || "");

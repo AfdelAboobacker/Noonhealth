@@ -1,16 +1,9 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  ChevronDown,
-  ChevronUp,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
 
 import ProductCard from "./ProductCard";
-import newArrivals from "../data/newarrival";
-import recentProducts from "../data/recent";
+import { getProducts } from "../api/productApi";
 
 const PRODUCTS_PER_PAGE = 18;
 
@@ -43,12 +36,10 @@ const getOptionValues = (products, fields) => {
     fields.flatMap((field) => {
       const value = product?.[field];
       return Array.isArray(value) ? value : value ? [value] : [];
-    })
+    }),
   );
 
-  return [...new Set(values.map(String))].sort((a, b) =>
-    a.localeCompare(b)
-  );
+  return [...new Set(values.map(String))].sort((a, b) => a.localeCompare(b));
 };
 
 const SeaallComponet = ({ onAddToCart }) => {
@@ -60,7 +51,9 @@ const SeaallComponet = ({ onAddToCart }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
-
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(true);
   const [brandOpen, setBrandOpen] = useState(false);
   const [genderOpen, setGenderOpen] = useState(false);
@@ -76,39 +69,49 @@ const SeaallComponet = ({ onAddToCart }) => {
   const [maxPrice, setMaxPrice] = useState("");
   const [minimumRating, setMinimumRating] = useState(0);
 
-  const allProducts = useMemo(
-    () => [...recentProducts, ...newArrivals],
-    []
-  );
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setError("Unable to load products.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchProducts();
+  }, []);
   const brands = useMemo(
     () => getOptionValues(allProducts, ["brand"]),
-    [allProducts]
+    [allProducts],
   );
 
   const genders = useMemo(
     () => getOptionValues(allProducts, ["gender"]),
-    [allProducts]
+    [allProducts],
   );
 
   const resellers = useMemo(
     () => getOptionValues(allProducts, ["reseller", "seller"]),
-    [allProducts]
+    [allProducts],
   );
 
   const products = useMemo(() => {
     let result =
       sortType === "Recent"
-        ? [...recentProducts]
+        ? allProducts.filter((product) => product.category === "recent")
         : sortType === "NewArrival"
-          ? [...newArrivals]
-          : [...recentProducts, ...newArrivals];
+          ? allProducts.filter((product) => product.category === "newarrival")
+          : [...allProducts];
 
     // Search matches product names only.
     if (isSearching) {
       const query = searchQuery.toLowerCase();
       result = result.filter((product) =>
-        getProductName(product).toLowerCase().includes(query)
+        getProductName(product).toLowerCase().includes(query),
       );
     }
 
@@ -116,52 +119,50 @@ const SeaallComponet = ({ onAddToCart }) => {
       result = result.filter((product) =>
         getCategory(product).some(
           (category) =>
-            String(category).toLowerCase() ===
-            selectedCategory.toLowerCase()
-        )
+            String(category).toLowerCase() === selectedCategory.toLowerCase(),
+        ),
       );
     }
 
     if (selectedBrands.length > 0) {
       result = result.filter((product) =>
-        selectedBrands.includes(String(product.brand ?? ""))
+        selectedBrands.includes(String(product.brand ?? "")),
       );
     }
 
     if (selectedGenders.length > 0) {
       result = result.filter((product) =>
-        selectedGenders.includes(String(product.gender ?? ""))
+        selectedGenders.includes(String(product.gender ?? "")),
       );
     }
 
     if (selectedResellers.length > 0) {
       result = result.filter((product) =>
         selectedResellers.includes(
-          String(product.reseller ?? product.seller ?? "")
-        )
+          String(product.reseller ?? product.seller ?? ""),
+        ),
       );
     }
 
     if (minPrice !== "") {
       result = result.filter(
-        (product) => getPrice(product) >= Number(minPrice)
+        (product) => getPrice(product) >= Number(minPrice),
       );
     }
 
     if (maxPrice !== "") {
       result = result.filter(
-        (product) => getPrice(product) <= Number(maxPrice)
+        (product) => getPrice(product) <= Number(maxPrice),
       );
     }
 
     if (minimumRating > 0) {
-      result = result.filter(
-        (product) => getRating(product) >= minimumRating
-      );
+      result = result.filter((product) => getRating(product) >= minimumRating);
     }
 
     return result;
   }, [
+    allProducts,
     sortType,
     isSearching,
     searchQuery,
@@ -187,22 +188,21 @@ const SeaallComponet = ({ onAddToCart }) => {
     maxPrice,
     minimumRating,
   ]);
-
   const totalPages = Math.max(
     1,
-    Math.ceil(products.length / PRODUCTS_PER_PAGE)
+    Math.ceil(products.length / PRODUCTS_PER_PAGE),
   );
 
   const paginatedProducts = products.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
+    currentPage * PRODUCTS_PER_PAGE,
   );
 
   const toggleSelection = (value, selected, setSelected) => {
     setSelected((previous) =>
       previous.includes(value)
         ? previous.filter((item) => item !== value)
-        : [...previous, value]
+        : [...previous, value],
     );
   };
 
@@ -212,7 +212,7 @@ const SeaallComponet = ({ onAddToCart }) => {
     setFavorites((previous) =>
       previous.includes(productId)
         ? previous.filter((id) => id !== productId)
-        : [...previous, productId]
+        : [...previous, productId],
     );
   };
 
@@ -251,9 +251,7 @@ const SeaallComponet = ({ onAddToCart }) => {
 
   const FilterSidebar = ({ mobile = false }) => (
     <aside
-      className={`rounded-xl bg-white ${
-        mobile ? "w-full" : "sticky top-24"
-      }`}
+      className={`rounded-xl bg-white ${mobile ? "w-full" : "sticky top-24"}`}
     >
       <div className="flex items-center justify-between border-b pb-3">
         <h2 className="font-semibold text-gray-900">Filters</h2>
@@ -286,9 +284,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                 checked={selectedCategory === category}
                 onChange={() =>
                   setSelectedCategory(
-                    selectedCategory === category
-                      ? "All Categories"
-                      : category
+                    selectedCategory === category ? "All Categories" : category,
                   )
                 }
               />
@@ -312,11 +308,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                   label={brand}
                   checked={selectedBrands.includes(brand)}
                   onChange={() =>
-                    toggleSelection(
-                      brand,
-                      selectedBrands,
-                      setSelectedBrands
-                    )
+                    toggleSelection(brand, selectedBrands, setSelectedBrands)
                   }
                 />
               ))}
@@ -340,11 +332,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                   label={gender}
                   checked={selectedGenders.includes(gender)}
                   onChange={() =>
-                    toggleSelection(
-                      gender,
-                      selectedGenders,
-                      setSelectedGenders
-                    )
+                    toggleSelection(gender, selectedGenders, setSelectedGenders)
                   }
                 />
               ))}
@@ -371,7 +359,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                     toggleSelection(
                       reseller,
                       selectedResellers,
-                      setSelectedResellers
+                      setSelectedResellers,
                     )
                   }
                 />
@@ -382,11 +370,7 @@ const SeaallComponet = ({ onAddToCart }) => {
       )}
 
       <div className="border-b">
-        <SectionHeader
-          title="Price"
-          open={priceOpen}
-          setOpen={setPriceOpen}
-        />
+        <SectionHeader title="Price" open={priceOpen} setOpen={setPriceOpen} />
         {priceOpen && (
           <div className="grid grid-cols-2 gap-2 pb-4">
             <input
@@ -423,9 +407,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                 label={`${rating}★ & above`}
                 checked={minimumRating === rating}
                 onChange={() =>
-                  setMinimumRating(
-                    minimumRating === rating ? 0 : rating
-                  )
+                  setMinimumRating(minimumRating === rating ? 0 : rating)
                 }
               />
             ))}
@@ -622,7 +604,7 @@ const SeaallComponet = ({ onAddToCart }) => {
 
                   {Array.from(
                     { length: totalPages },
-                    (_, index) => index + 1
+                    (_, index) => index + 1,
                   ).map((page) => (
                     <button
                       key={page}
@@ -642,9 +624,7 @@ const SeaallComponet = ({ onAddToCart }) => {
                     type="button"
                     disabled={currentPage === totalPages}
                     onClick={() =>
-                      setCurrentPage((page) =>
-                        Math.min(totalPages, page + 1)
-                      )
+                      setCurrentPage((page) => Math.min(totalPages, page + 1))
                     }
                     className="rounded-lg border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
