@@ -659,6 +659,7 @@ const SeaallComponet = ({ onAddToCart }) => {
           )}
         </div>
       </div>
+      {/*  */}
     </section>
   );
 };
