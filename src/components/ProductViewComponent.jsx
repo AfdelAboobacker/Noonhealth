@@ -747,6 +747,7 @@ const ProductViewComponent = ({ product, onAddToCart }) => {
           </div>
         )}
       </div>
+      {/*  */}
     </main>
   );
 };
