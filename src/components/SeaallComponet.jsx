@@ -48,6 +48,7 @@ const SeaallComponet = ({ onAddToCart }) => {
   const isSearching = searchQuery.length > 0;
 
   const [sortType, setSortType] = useState("All");
+  const [priceSort, setPriceSort] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -160,10 +161,18 @@ const SeaallComponet = ({ onAddToCart }) => {
       result = result.filter((product) => getRating(product) >= minimumRating);
     }
 
+    // Sort the filtered products by price without changing the original API data.
+    if (priceSort === "lowToHigh") {
+      result.sort((a, b) => getPrice(a) - getPrice(b));
+    } else if (priceSort === "highToLow") {
+      result.sort((a, b) => getPrice(b) - getPrice(a));
+    }
+
     return result;
   }, [
     allProducts,
     sortType,
+    priceSort,
     isSearching,
     searchQuery,
     selectedCategory,
@@ -180,6 +189,7 @@ const SeaallComponet = ({ onAddToCart }) => {
   }, [
     searchQuery,
     sortType,
+    priceSort,
     selectedCategory,
     selectedBrands,
     selectedGenders,
@@ -538,6 +548,19 @@ const SeaallComponet = ({ onAddToCart }) => {
               <option value="All">All Products</option>
               <option value="Recent">Recent</option>
               <option value="NewArrival">New Arrivals</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="hidden sm:inline">Price</span>
+            <select
+              value={priceSort}
+              onChange={(event) => setPriceSort(event.target.value)}
+              className="max-w-[150px] rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-green-700"
+            >
+              <option value="default">Default Price</option>
+              <option value="lowToHigh">Low to High</option>
+              <option value="highToLow">High to Low</option>
             </select>
           </label>
         </div>
