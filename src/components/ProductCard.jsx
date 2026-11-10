@@ -1,3 +1,4 @@
+
 import { Heart, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,8 +18,6 @@ const ProductCard = ({
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-
-    // Send product to App.jsx cart
     onAddToCart?.(product, 1);
   };
 
@@ -26,15 +25,8 @@ const ProductCard = ({
     <div
       onClick={handleProductClick}
       className="
-        flex
-        h-full
-        w-full
-        cursor-pointer
-        flex-col
-        overflow-hidden
-        rounded-[16px]
-        bg-[#e5edc8]
-
+        flex h-full w-full cursor-pointer flex-col
+        overflow-hidden rounded-[16px] bg-[#e5edc8]
         sm:rounded-[18px]
         lg:rounded-[20px]
       "
@@ -60,19 +52,10 @@ const ProductCard = ({
               : "Add to favorites"
           }
           className="
-            absolute
-            right-2
-            top-2
-            z-10
-            transition-transform
-            duration-200
-            hover:scale-110
-
-            sm:right-3
-            sm:top-3
-
-            lg:right-4
-            lg:top-4
+            absolute right-2 top-2 z-10
+            transition-transform duration-200 hover:scale-110
+            sm:right-3 sm:top-3
+            lg:right-4 lg:top-4
           "
         >
           <Heart
@@ -90,19 +73,12 @@ const ProductCard = ({
       {/* PRODUCT DETAILS */}
       <div
         className="
-          flex
-          flex-1
-          flex-col
-          px-2.5
-          pb-3
-          pt-2.5
-
-          sm:px-3
-          sm:pb-4
-          sm:pt-3
+          flex flex-1 flex-col
+          px-2.5 pb-3 pt-2.5
+          sm:px-3 sm:pb-4 sm:pt-3
         "
       >
-        {/* DESCRIPTION */}
+        {/* PRODUCT NAME */}
         <p
           className="
             line-clamp-2
@@ -112,31 +88,23 @@ const ProductCard = ({
             font-semibold
             leading-[18px]
             text-black
-
             sm:h-[40px]
             sm:text-[13px]
             sm:leading-[20px]
-
             lg:h-[44px]
             lg:text-[14px]
             lg:leading-[22px]
           "
         >
-          {product.description}
+          {product.name}
         </p>
 
         {/* PRICE */}
         <div
           className="
-            mt-1.5
-            flex
-            flex-wrap
-            items-center
-            gap-x-2
-            gap-y-0.5
-
-            sm:mt-2
-            sm:gap-x-3
+            mt-1.5 flex flex-wrap items-center
+            gap-x-2 gap-y-0.5
+            sm:mt-2 sm:gap-x-3
           "
         >
           <span className="text-[11px] font-bold text-black sm:text-[13px] lg:text-[14px]">
@@ -157,31 +125,14 @@ const ProductCard = ({
           type="button"
           onClick={handleAddToCart}
           className="
-            mt-auto
-            flex
-            h-[34px]
-            w-full
-            items-center
-            justify-center
-            gap-1.5
-            rounded-[8px]
-            bg-[#4b6800]
-            text-[11px]
-            font-semibold
-            text-white
-            transition-all
-            duration-200
-            hover:bg-[#3d5500]
-            active:scale-[0.98]
-
-            sm:h-[40px]
-            sm:gap-2
-            sm:rounded-[10px]
-            sm:text-[14px]
-
-            lg:h-[44px]
-            lg:rounded-[11px]
-            lg:text-[16px]
+            mt-auto flex h-[34px] w-full
+            items-center justify-center gap-1.5
+            rounded-[8px] bg-[#4b6800]
+            text-[11px] font-semibold text-white
+            transition-all duration-200
+            hover:bg-[#3d5500] active:scale-[0.98]
+            sm:h-[40px] sm:gap-2 sm:rounded-[10px] sm:text-[14px]
+            lg:h-[44px] lg:rounded-[11px] lg:text-[16px]
           "
         >
           <ShoppingBag
